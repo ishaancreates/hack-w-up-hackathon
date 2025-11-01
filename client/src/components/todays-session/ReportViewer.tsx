@@ -70,8 +70,8 @@ const ReportViewer = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-2xl w-[90%] max-w-6xl h-[90%] flex flex-col animate-[slideInUp_0.3s_ease-out]">
+        <div className="fixed inset-0 flex backdrop-blur-md items-center justify-center z-50 pointer-events-none">
+            <div className="bg-white rounded-lg shadow-2xl w-[60%] h-[90%] flex flex-col animate-[slideInUp_0.1s_ease-out] pointer-events-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -90,7 +90,7 @@ const ReportViewer = ({ isOpen, onClose }) => {
                 {/* Three Column Layout */}
                 <div className="flex flex-1 overflow-hidden">
                     {/* Column 1: Reports List */}
-                    <div className="w-1/3 border-r border-gray-200 overflow-y-auto">
+                    <div className="w-1/4 border-r border-gray-200 overflow-y-auto">
                         <div className="p-4">
                             <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wide">
                                 Recent Reports
@@ -126,7 +126,7 @@ const ReportViewer = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Column 2: Report Details */}
-                    <div className="w-1/3 border-r border-gray-200 overflow-y-auto">
+                    <div className="w-2/4 border-r border-gray-200 overflow-y-auto">
                         <div className="p-6">
                             <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wide">
                                 Report Details
@@ -166,7 +166,7 @@ const ReportViewer = ({ isOpen, onClose }) => {
                     </div>
 
                     {/* Column 3: Summary */}
-                    <div className="w-1/3 overflow-y-auto bg-gradient-to-br from-gray-50 to-blue-50">
+                    <div className="w-1/4 overflow-y-auto bg-gradient-to-br from-gray-50 to-blue-50">
                         <div className="p-6">
                             <h3 className="text-sm font-semibold text-gray-600 mb-4 uppercase tracking-wide">
                                 Summary & Analysis

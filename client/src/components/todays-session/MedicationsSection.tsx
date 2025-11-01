@@ -215,6 +215,9 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
     const allMedications = [...aiMedications, ...medications];
     const displayMedications = searchQuery.trim() ? searchResults : allMedications;
 
+    // Show cards only when AI has recommendations or search is active
+    const shouldShowCards = aiMedications.length > 0 || searchQuery.trim();
+
     return (
         <div className="flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between mb-3 shrink-0">
@@ -252,42 +255,50 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
 
                 {/* AI Recommendations Section */}
                 {aiMedications.length > 0 && !searchQuery && (
-                    <div className="mb-4 pb-4 border-b border-blue-200">
+                    <div className="mb-4 pb-4 border-b border-blue-200 animate-in fade-in slide-in-from-top-4 duration-500">
                         <div className="flex items-center gap-2 mb-3">
                             <Sparkles className="w-4 h-4 text-blue-600" />
                             <h4 className="text-sm font-semibold text-blue-600">AI Recommendations</h4>
                         </div>
                         <div className="space-y-2.5">
-                            {aiMedications.map((medication) => (
-                                <MedicationCard
+                            {aiMedications.map((medication, index) => (
+                                <div
                                     key={medication.id}
-                                    name={medication.name}
-                                    dosageOptions={medication.dosageOptions}
-                                    frequencyOptions={medication.frequencyOptions}
-                                    defaultDosage={medication.defaultDosage}
-                                    defaultFrequency={medication.defaultFrequency}
-                                    isSelected={selectedMedications.includes(medication.id)}
-                                    onToggle={() => onToggleMedication(medication.id)}
-                                />
+                                    className="animate-in fade-in slide-in-from-left-4 duration-500"
+                                    style={{ animationDelay: `${index * 100}ms` }}
+                                >
+                                    <MedicationCard
+                                        name={medication.name}
+                                        dosageOptions={medication.dosageOptions}
+                                        frequencyOptions={medication.frequencyOptions}
+                                        defaultDosage={medication.defaultDosage}
+                                        defaultFrequency={medication.defaultFrequency}
+                                        isSelected={selectedMedications.includes(medication.id)}
+                                        onToggle={() => onToggleMedication(medication.id)}
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
                 )}
 
-                <div className="space-y-2.5 pb-16">
-                    {(searchQuery ? displayMedications : medications).map((medication) => (
-                        <MedicationCard
-                            key={medication.id}
-                            name={medication.name}
-                            dosageOptions={medication.dosageOptions}
-                            frequencyOptions={medication.frequencyOptions}
-                            defaultDosage={medication.defaultDosage}
-                            defaultFrequency={medication.defaultFrequency}
-                            isSelected={selectedMedications.includes(medication.id)}
-                            onToggle={() => onToggleMedication(medication.id)}
-                        />
-                    ))}
-                </div>
+                {/* Static Medications - Only show when AI has recommendations or search is active */}
+                {shouldShowCards && (
+                    <div className="space-y-2.5 pb-16">
+                        {(searchQuery ? displayMedications : medications).map((medication) => (
+                            <MedicationCard
+                                key={medication.id}
+                                name={medication.name}
+                                dosageOptions={medication.dosageOptions}
+                                frequencyOptions={medication.frequencyOptions}
+                                defaultDosage={medication.defaultDosage}
+                                defaultFrequency={medication.defaultFrequency}
+                                isSelected={selectedMedications.includes(medication.id)}
+                                onToggle={() => onToggleMedication(medication.id)}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

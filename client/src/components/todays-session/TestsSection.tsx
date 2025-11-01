@@ -88,6 +88,9 @@ const TestsSection: React.FC<TestsSectionProps> = ({
     const allTests = [...aiTests, ...tests];
     const displayTests = searchQuery.trim() ? searchResults : allTests;
 
+    // Show cards only when AI has recommendations or search is active
+    const shouldShowCards = aiTests.length > 0 || searchQuery.trim();
+
     return (
         <div className="flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between mb-3 shrink-0">
@@ -125,34 +128,41 @@ const TestsSection: React.FC<TestsSectionProps> = ({
 
                 {/* AI Recommendations Section */}
                 {aiTests.length > 0 && !searchQuery && (
-                    <div className="mb-4 pb-4 border-b border-blue-200">
+                    <div className="mb-4 pb-4 border-b border-blue-200 animate-in fade-in slide-in-from-top-4 duration-500">
                         <div className="flex items-center gap-2 mb-3">
                             <Sparkles className="w-4 h-4 text-blue-600" />
                             <h4 className="text-sm font-semibold text-blue-600">AI Recommendations</h4>
                         </div>
                         <div className="space-y-2.5">
-                            {recommendations.tests.map((test) => (
-                                <TestCard
+                            {recommendations.tests.map((test, index) => (
+                                <div
                                     key={test.name}
-                                    name={test.name}
-                                    isSelected={selectedTests.includes(test.name)}
-                                    onToggle={() => onToggleTest(test.name)}
-                                />
+                                    className="animate-in fade-in slide-in-from-left-4 duration-500"
+                                    style={{ animationDelay: `${index * 100}ms` }}
+                                >
+                                    <TestCard
+                                        name={test.name}
+                                        isSelected={selectedTests.includes(test.name)}
+                                        onToggle={() => onToggleTest(test.name)}
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
                 )}
 
-                <div className="space-y-2.5 pb-16">
-                    {(searchQuery ? displayTests : tests).map((test) => (
-                        <TestCard
-                            key={test}
-                            name={test}
-                            isSelected={selectedTests.includes(test)}
-                            onToggle={() => onToggleTest(test)}
-                        />
-                    ))}
-                </div>
+                {shouldShowCards && (
+                    <div className="space-y-2.5 pb-16">
+                        {(searchQuery ? displayTests : tests).map((test) => (
+                            <TestCard
+                                key={test}
+                                name={test}
+                                isSelected={selectedTests.includes(test)}
+                                onToggle={() => onToggleTest(test)}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
