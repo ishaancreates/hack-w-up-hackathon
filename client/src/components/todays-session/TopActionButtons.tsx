@@ -10,10 +10,10 @@ const TopActionButtons = () => {
                 </h1>
             </div>
             <div className="flex gap-3">
-                <button className="px-4 py-2 text-red-300 font-medium rounded-lg border border-red-300/30 shadow-sm hover:bg-red-200/30 hover:text-red-500 hover:border-red-300/50 hover:shadow-md transition-all duration-300">
+                <button className="px-4 py-2 bg-white/70 backdrop-blur-sm text-gray-700 font-medium rounded-lg border border-gray-300 shadow-sm hover:bg-white hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
                     Skip Patient
                 </button>
-                <button className="px-4 py-2 bg-red-500/20 backdrop-blur-lg text-red-600 font-medium rounded-lg border border-red-300/30 shadow-sm hover:bg-red-500/30 hover:text-red-700 hover:border-red-300/50 hover:shadow-md transition-all duration-300">
+                <button className="px-4 py-2 bg-white/70 backdrop-blur-sm text-gray-700 font-medium rounded-lg border border-gray-300 shadow-sm hover:bg-white hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
                     End Session
                 </button>
             </div>

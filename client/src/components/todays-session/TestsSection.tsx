@@ -34,7 +34,7 @@ const TestsSection: React.FC<TestsSectionProps> = ({
                     ))}
                 </div>
                 <div className="sticky bottom-0 -mx-4 px-4 py-3 bg-white/80 backdrop-blur-sm border-t border-gray-200">
-                    <button className="w-full h-11 px-4 text-sm font-medium bg-white text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition shadow-none hover:shadow-sm focus:outline-none focus:ring-1 focus:ring-gray-300">
+                    <button className="w-full h-11 px-4 text-sm font-medium bg-white/70 backdrop-blur-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-white hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300">
                         Proceed with Tests
                     </button>
                 </div>

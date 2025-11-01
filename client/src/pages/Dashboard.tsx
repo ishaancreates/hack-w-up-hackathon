@@ -70,8 +70,9 @@ export default function Dashboard() {
 
   function onStart(id: string) {
     setPatients((prev) => prev.map((p) => (p.id === id ? { ...p, status: "in-session" } : p)));
+    navigate(`/todays-session?patientId=${id}`);
   }
-  
+
   function onDone(id: string) {
     setPatients((prev) => prev.map((p) => (p.id === id ? { ...p, status: "done" } : p)));
   }
@@ -264,8 +265,8 @@ export default function Dashboard() {
                     <span className="text-sm text-gray-600">{type}</span>
                     <div className="flex items-center gap-2">
                       <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full" 
+                        <div
+                          className="h-full"
                           style={{ width: `${(count / patients.length) * 100}%`, background: 'linear-gradient(to right, #6a8a6a, #7a9a7a)' }}
                         ></div>
                       </div>
@@ -323,7 +324,7 @@ function PatientCard({ patient, onStart, onDone, onClick }: { patient: Patient; 
   const typeColor = typeColors[patient.appointmentType];
 
   return (
-    <div 
+    <div
       className="bg-gradient-to-br from-white to-gray-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all cursor-pointer"
       onClick={onClick}
     >
@@ -335,22 +336,22 @@ function PatientCard({ patient, onStart, onDone, onClick }: { patient: Patient; 
           </div>
           <p className="text-sm text-gray-600">{patient.reason}</p>
         </div>
-        <span 
-          className="px-2.5 py-1 rounded-full text-xs font-medium border" 
+        <span
+          className="px-2.5 py-1 rounded-full text-xs font-medium border"
           style={{ backgroundColor: status.bg, color: status.text, borderColor: status.border }}
         >
           {status.label}
         </span>
       </div>
-      
+
       <div className="flex items-center justify-between">
-        <span 
-          className="px-2.5 py-1 rounded-md text-xs font-medium border" 
+        <span
+          className="px-2.5 py-1 rounded-md text-xs font-medium border"
           style={{ backgroundColor: typeColor.bg, color: typeColor.text, borderColor: typeColor.border }}
         >
           {patient.appointmentType}
         </span>
-        
+
         <div className="flex gap-2">
           {patient.status === "waiting" && (
             <button
@@ -430,7 +431,7 @@ function AddPatient({ onAdd }: { onAdd: (p: { name: string; age: number; reason:
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
@@ -443,7 +444,7 @@ function AddPatient({ onAdd }: { onAdd: (p: { name: string; age: number; reason:
               onBlur={(e) => e.target.style.boxShadow = 'none'}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
             <input
@@ -456,7 +457,7 @@ function AddPatient({ onAdd }: { onAdd: (p: { name: string; age: number; reason:
               onBlur={(e) => e.target.style.boxShadow = 'none'}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
             <input
@@ -468,7 +469,7 @@ function AddPatient({ onAdd }: { onAdd: (p: { name: string; age: number; reason:
               onBlur={(e) => e.target.style.boxShadow = 'none'}
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Appointment Type</label>
             <select
@@ -484,7 +485,7 @@ function AddPatient({ onAdd }: { onAdd: (p: { name: string; age: number; reason:
               <option value="Checkup">Checkup</option>
             </select>
           </div>
-          
+
           <div className="flex gap-3 pt-2">
             <button
               onClick={submit}
