@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import TopActionButtons from './TopActionButtons';
 import MedicationsSection from './MedicationsSection';
 import TestsSection from './TestsSection';
-import { FileText, Printer, Share2 } from 'lucide-react';
+import { Clock, FileText, Printer, Share2 } from 'lucide-react';
 import ReportViewer from './ReportViewer';
 
 const MainArea = () => {
@@ -54,8 +54,8 @@ const MainArea = () => {
                     Reports
                 </button>
                 <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-md">
-                    <Printer className="w-5 h-5" />
-                    Print
+                    <Clock className="w-5 h-5" />
+                    History
                 </button>
                 <button className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors shadow-md">
                     <Share2 className="w-5 h-5" />
