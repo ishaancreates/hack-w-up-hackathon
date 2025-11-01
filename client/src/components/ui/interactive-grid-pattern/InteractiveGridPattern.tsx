@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { cn } from "../../../utils/index";
+import { cn } from "../../../utils";
 
 export type InteractiveGridPatternProps = {
   className?: string;

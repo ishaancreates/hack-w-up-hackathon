@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { ref, computed, type HTMLAttributes } from "vue";
 
 interface InteractiveGridPatternProps {
