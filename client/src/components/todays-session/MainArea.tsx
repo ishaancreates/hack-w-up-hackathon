@@ -40,6 +40,16 @@ const MainArea = () => {
                     />
                 </div>
             </div>
+
+            {/* Reports and History buttons at the bottom */}
+            <div className="flex justify-center space-x-3 mt-4 shrink-0">
+                <button className="mt-5 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md hover:shadow-lg shrink-0">
+                    Reports
+                </button>
+                <button className="mt-5 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md hover:shadow-lg shrink-0">
+                    History
+                </button>
+            </div>
         </div>
     )
 }
