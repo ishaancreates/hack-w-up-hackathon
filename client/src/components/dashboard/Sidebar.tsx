@@ -32,11 +32,10 @@ export default function Sidebar({
     <aside className="sticky top-0 flex h-screen w-full max-w-xs flex-col gap-4 border-r border-gray-200 bg-white/60 p-4 backdrop-blur-sm dark:border-gray-700/50 dark:bg-black/20">
       {/* Profile (animated hide/show on scroll) */}
       <div
-        className={`transition-all duration-300 ease-out transform-gpu ${
-          collapsed
+        className={`transition-all duration-300 ease-out transform-gpu ${collapsed
             ? "opacity-0 -translate-y-3 max-h-0 overflow-hidden pointer-events-none"
             : "opacity-100 translate-y-0 max-h-60"
-        }`}
+          }`}
         aria-hidden={collapsed}
       >
         <ProfileCard name="Dr. A. Sharma" specialization="Cardiologist" upcoming={3} onLogout={onLogout} />
@@ -44,7 +43,7 @@ export default function Sidebar({
 
       {/* Top navigation removed as requested */}
 
-  {/* Footer removed as requested */}
+      {/* Footer removed as requested */}
     </aside>
   );
 }
