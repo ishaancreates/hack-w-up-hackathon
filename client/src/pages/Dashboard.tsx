@@ -2,8 +2,7 @@ import { useMemo, useState } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import PatientCard from "@/components/dashboard/PatientCard";
-import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
-import { cn } from "../utils/index";;
+import Navbar from "@/components/dashboard/Navbar";
 import type { AppointmentType, Patient } from "@/types";
 
 const initialPatients: Patient[] = [
@@ -58,15 +57,16 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
-      <InteractiveGridPattern
-        className={"fixed inset-0 h-screen w-screen border-0 select-none [mask-image:radial-gradient(60%_60%_at_50%_40%,black,transparent)]"}
-        squaresClassName="hover:fill-gray-400/40"
-        width={42}
-        height={42}
-        squares={[26, 26]}
-      />
-
+    // <main className="relative min-h-screen overflow-hidden">
+    //   <InteractiveGridPattern
+    //     className={"fixed inset-0 h-screen w-screen border-0 select-none [mask-image:radial-gradient(60%_60%_at_50%_40%,black,transparent)]"}
+    //     squaresClassName="hover:fill-gray-400/40"
+    //     width={42}
+    //     height={42}
+    //     squares={[26, 26]}
+    //   />
+<main>
+  <Navbar doctorName="Dr. A. Sharma" />
       <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 md:grid-cols-[280px,1fr]">
         <Sidebar onLogout={() => alert("Logged out (demo)")} />
 
