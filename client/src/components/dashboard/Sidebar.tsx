@@ -1,5 +1,4 @@
 import ProfileCard from "./ProfileCard";
-import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
 export default function Sidebar({
@@ -43,21 +42,9 @@ export default function Sidebar({
         <ProfileCard name="Dr. A. Sharma" specialization="Cardiologist" upcoming={3} onLogout={onLogout} />
       </div>
 
-      {/* Nav (animated hide/show on scroll) */}
-      <nav
-        className={`mt-2 space-y-1 text-sm transition-all duration-300 ease-out transform-gpu ${
-          collapsed
-            ? "opacity-0 -translate-y-2 max-h-0 overflow-hidden pointer-events-none"
-            : "opacity-100 translate-y-0 max-h-40"
-        }`}
-        aria-hidden={collapsed}
-      >
-        <Link to="/dashboard" className="block rounded-md px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10">Dashboard</Link>
-        <Link to="/get-started" className="block rounded-md px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10">Get Started</Link>
-        <Link to="/learn-more" className="block rounded-md px-3 py-2 hover:bg-black/5 dark:hover:bg-white/10">Learn More</Link>
-      </nav>
+      {/* Top navigation removed as requested */}
 
-      <div className="mt-auto text-center text-[10px] text-gray-500">© {new Date().getFullYear()} Clinic</div>
+  {/* Footer removed as requested */}
     </aside>
   );
 }
