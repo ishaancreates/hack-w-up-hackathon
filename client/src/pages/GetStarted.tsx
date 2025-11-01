@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { InteractiveGridPattern } from "../components/ui/interactive-grid-pattern";
-import { cn } from "../lib/utils";
+import { cn } from "../utils";
 
 export default function GetStarted() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
