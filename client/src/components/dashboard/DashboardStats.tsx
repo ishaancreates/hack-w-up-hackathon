@@ -13,14 +13,17 @@ export default function DashboardStats({
     { label: 'Avg. Consultation (min)', value: avgConsultationMins },
   ];
 
-  return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-      {items.map((i) => (
-        <div key={i.label} className="rounded-lg border border-gray-200 bg-white/80 p-4 text-center shadow-sm backdrop-blur-sm dark:border-gray-700/50 dark:bg-black/30">
-          <div className="text-xs text-gray-500">{i.label}</div>
-          <div className="mt-1 text-2xl font-semibold">{i.value}</div>
-        </div>
-      ))}
-    </div>
-  );
+    return (
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+        {items.map((i) => (
+          <div
+            key={i.label}
+            className="rounded-md border border-gray-200 bg-white/80 p-3 text-center shadow-sm backdrop-blur-sm dark:border-gray-700/50 dark:bg-black/30"
+          >
+            <div className="text-[11px] text-gray-500">{i.label}</div>
+            <div className="mt-0.5 text-xl font-semibold">{i.value}</div>
+          </div>
+        ))}
+      </div>
+    );
 }

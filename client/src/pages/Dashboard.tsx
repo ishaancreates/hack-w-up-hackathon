@@ -57,13 +57,13 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="relative min-h-screen ">
+    <main className="relative min-h-screen bg-white text-black">
       <Navbar doctorName="Dr. A. Sharma" />
 
-      <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 md:grid-cols-[280px,1fr]">
+      <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 md:grid-cols-[260px,1fr]">
         <Sidebar onLogout={() => alert("Logged out (demo)")} />
 
-        <section className="flex flex-col gap-6 p-6">
+        <section className="flex flex-col gap-4 p-4">
           {/* Header and actions */}
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <h1 className="text-2xl font-semibold">Doctor Dashboard</h1>
@@ -82,8 +82,8 @@ export default function Dashboard() {
           <DashboardStats totalPatients={patients.length} activeSessions={activeSessions} avgConsultationMins={18} />
 
           {/* Filters */}
-          <div className="rounded-lg border border-gray-200 bg-white/70 p-4 backdrop-blur-sm dark:border-gray-700/50 dark:bg-black/30">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+          <div className="rounded-md border border-gray-200 bg-white/70 p-3 backdrop-blur-sm dark:border-gray-700/50 dark:bg-black/30">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -121,7 +121,7 @@ export default function Dashboard() {
           </div>
 
           {/* Queue */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 sm:grid-cols-3 lg:grid-cols-4">
             {filtered.map((p) => (
               <PatientCard key={p.id} patient={p} onStart={onStart} onDone={onDone} />
             ))}
