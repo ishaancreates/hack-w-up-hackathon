@@ -1,23 +1,20 @@
 import MainArea from '@/components/todays-session/MainArea'
 import Sidebar from '@/components/todays-session/Sidebar'
 import React from 'react'
+import { SessionProvider } from '@/contexts/SessionContext'
 
 const SessionPage = () => {
     return (
-        <>
-
-            <div className="flex h-screen">
-                <div className="w-1/4">
+        <SessionProvider>
+            <div className="flex h-screen w-screen overflow-hidden">
+                <div className="w-1/4 h-full overflow-y-auto">
                     <Sidebar />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 h-full overflow-y-auto">
                     <MainArea />
                 </div>
             </div>
-
-
-
-        </>
+        </SessionProvider>
     )
 }
 

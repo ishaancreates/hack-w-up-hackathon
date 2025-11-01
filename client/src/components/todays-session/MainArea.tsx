@@ -27,7 +27,7 @@ const MainArea = () => {
     };
 
     return (
-        <div className="h-screen bg-white p-6 flex flex-col overflow-hidden">
+        <div className="h-full w-full bg-white p-6 flex flex-col overflow-hidden">
             <TopActionButtons />
 
             <div className="recommendations-area flex-1 flex flex-col min-h-0">

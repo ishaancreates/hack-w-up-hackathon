@@ -1,5 +1,7 @@
 import React from 'react';
 import TestCard from './TestCard';
+import { useSession } from '../../contexts/SessionContext';
+import { Sparkles } from 'lucide-react';
 
 interface TestsSectionProps {
     selectedTests: string[];
@@ -13,6 +15,7 @@ const TestsSection: React.FC<TestsSectionProps> = ({
     const [searchQuery, setSearchQuery] = React.useState('');
     const [searchResults, setSearchResults] = React.useState<string[]>([]);
     const [isSearching, setIsSearching] = React.useState(false);
+    const { recommendations, isLoadingRecommendations } = useSession();
 
     const tests = [
         'Complete Blood Count (CBC)',
@@ -80,11 +83,22 @@ const TestsSection: React.FC<TestsSectionProps> = ({
         return () => clearTimeout(timer);
     }, [searchQuery, searchTestsFromDB]);
 
-    const displayTests = searchQuery.trim() ? searchResults : tests;
+    // Add AI recommended tests
+    const aiTests = recommendations.tests.map(t => t.name);
+    const allTests = [...aiTests, ...tests];
+    const displayTests = searchQuery.trim() ? searchResults : allTests;
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
-            <h3 className="text-base font-semibold mb-3 text-gray-700 shrink-0">Recommended Tests</h3>
+            <div className="flex items-center justify-between mb-3 shrink-0">
+                <h3 className="text-base font-semibold text-gray-700">Recommended Tests</h3>
+                {isLoadingRecommendations && (
+                    <div className="flex items-center gap-2 text-xs text-blue-600">
+                        <Sparkles className="w-4 h-4 animate-pulse" />
+                        <span>AI analyzing...</span>
+                    </div>
+                )}
+            </div>
             <div className="flex-1 bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow border border-gray-200 overflow-y-auto">
                 {/* Search Bar */}
                 <div className="mb-3 sticky top-0 bg-white/90 backdrop-blur-sm z-10 pb-2">
@@ -109,8 +123,28 @@ const TestsSection: React.FC<TestsSectionProps> = ({
                     )}
                 </div>
 
+                {/* AI Recommendations Section */}
+                {aiTests.length > 0 && !searchQuery && (
+                    <div className="mb-4 pb-4 border-b border-blue-200">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Sparkles className="w-4 h-4 text-blue-600" />
+                            <h4 className="text-sm font-semibold text-blue-600">AI Recommendations</h4>
+                        </div>
+                        <div className="space-y-2.5">
+                            {recommendations.tests.map((test) => (
+                                <TestCard
+                                    key={test.name}
+                                    name={test.name}
+                                    isSelected={selectedTests.includes(test.name)}
+                                    onToggle={() => onToggleTest(test.name)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="space-y-2.5 pb-16">
-                    {displayTests.map((test) => (
+                    {(searchQuery ? displayTests : tests).map((test) => (
                         <TestCard
                             key={test}
                             name={test}

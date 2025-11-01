@@ -1,5 +1,7 @@
 import React from 'react';
 import MedicationCard from './MedicationCard';
+import { useSession } from '../../contexts/SessionContext';
+import { Sparkles } from 'lucide-react';
 
 interface MedicationData {
     id: string;
@@ -8,6 +10,8 @@ interface MedicationData {
     frequencyOptions: { value: string; label: string }[];
     defaultDosage: string;
     defaultFrequency: string;
+    isAIRecommended?: boolean;
+    aiReason?: string;
 }
 
 interface MedicationsSectionProps {
@@ -22,6 +26,7 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
     const [searchQuery, setSearchQuery] = React.useState('');
     const [searchResults, setSearchResults] = React.useState<MedicationData[]>([]);
     const [isSearching, setIsSearching] = React.useState(false);
+    const { recommendations, isLoadingRecommendations } = useSession();
 
     const medications: MedicationData[] = [
         {
@@ -193,11 +198,34 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
         return () => clearTimeout(timer);
     }, [searchQuery, searchMedicationsFromDB]);
 
-    const displayMedications = searchQuery.trim() ? searchResults : medications;
+    // Merge AI recommendations with static medications
+    const aiMedications: MedicationData[] = React.useMemo(() => {
+        return recommendations.medications.map(med => ({
+            id: `${med.name} ${med.dosage}`,
+            name: med.name,
+            dosageOptions: [med.dosage],
+            frequencyOptions: [{ value: med.frequency, label: med.frequency }],
+            defaultDosage: med.dosage,
+            defaultFrequency: med.frequency,
+            isAIRecommended: true,
+            aiReason: med.reason
+        }));
+    }, [recommendations.medications]);
+
+    const allMedications = [...aiMedications, ...medications];
+    const displayMedications = searchQuery.trim() ? searchResults : allMedications;
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
-            <h3 className="text-base font-semibold mb-3 text-gray-700 shrink-0">Recommended Medications</h3>
+            <div className="flex items-center justify-between mb-3 shrink-0">
+                <h3 className="text-base font-semibold text-gray-700">Recommended Medications</h3>
+                {isLoadingRecommendations && (
+                    <div className="flex items-center gap-2 text-xs text-blue-600">
+                        <Sparkles className="w-4 h-4 animate-pulse" />
+                        <span>AI analyzing...</span>
+                    </div>
+                )}
+            </div>
             <div className="flex-1 bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow border border-gray-200 overflow-y-auto">
                 {/* Search Bar */}
                 <div className="mb-3 sticky top-0 bg-white/90 backdrop-blur-sm z-10 pb-2">
@@ -222,8 +250,32 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
                     )}
                 </div>
 
+                {/* AI Recommendations Section */}
+                {aiMedications.length > 0 && !searchQuery && (
+                    <div className="mb-4 pb-4 border-b border-blue-200">
+                        <div className="flex items-center gap-2 mb-3">
+                            <Sparkles className="w-4 h-4 text-blue-600" />
+                            <h4 className="text-sm font-semibold text-blue-600">AI Recommendations</h4>
+                        </div>
+                        <div className="space-y-2.5">
+                            {aiMedications.map((medication) => (
+                                <MedicationCard
+                                    key={medication.id}
+                                    name={medication.name}
+                                    dosageOptions={medication.dosageOptions}
+                                    frequencyOptions={medication.frequencyOptions}
+                                    defaultDosage={medication.defaultDosage}
+                                    defaultFrequency={medication.defaultFrequency}
+                                    isSelected={selectedMedications.includes(medication.id)}
+                                    onToggle={() => onToggleMedication(medication.id)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="space-y-2.5 pb-16">
-                    {displayMedications.map((medication) => (
+                    {(searchQuery ? displayMedications : medications).map((medication) => (
                         <MedicationCard
                             key={medication.id}
                             name={medication.name}

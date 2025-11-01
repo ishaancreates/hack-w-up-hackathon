@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useWebSpeechRecognition } from '../../hooks';
+import { useSession } from '../../contexts/SessionContext';
 
 const initialPatients = [
     { id: 1, name: 'Priya Sharma', time: '10:00 AM', status: 'active', age: 38, pastDiseases: 'Allergic Rhinitis', weight: '68 kg', bp: '118/75', sugarLevel: '92 mg/dL' },
@@ -14,8 +15,16 @@ const Sidebar = () => {
     const [isHovered, setIsHovered] = useState(false);
     const activePatient = patients.find(p => p.status === 'active');
     const [transcript, setTranscript] = useState<{ speaker: string; text: string }[]>([]);
+    const { addTranscript, setActivePatient } = useSession();
     // Use English recognition
     const { interim, finals, isListening, error, start, stop } = useWebSpeechRecognition('en-US');
+
+    // Set active patient in context
+    useEffect(() => {
+        if (activePatient) {
+            setActivePatient(activePatient);
+        }
+    }, [activePatient, setActivePatient]);
 
     // Reset transcript when active patient changes
     useEffect(() => {
@@ -31,10 +40,15 @@ const Sidebar = () => {
                 const lastSpeaker = prev.length > 0 ? prev[prev.length - 1].speaker.toLowerCase() as 'doctor' | 'patient' : undefined;
                 const detectedSpeaker = detectSpeaker(last.text.trim(), lastSpeaker);
                 const speaker = detectedSpeaker === 'doctor' ? 'Doctor' : 'Patient';
+
+                // Add to context for Gemini processing
+                console.log(`Adding to transcript: ${speaker}: ${last.text.trim()}`);
+                addTranscript(speaker, last.text.trim());
+
                 return [...prev, { speaker, text: last.text.trim() }];
             });
         }
-    }, [finals]);
+    }, [finals, addTranscript]);
 
     // Smart speaker detection function
     const detectSpeaker = (text: string, previousSpeaker?: 'doctor' | 'patient'): 'doctor' | 'patient' => {
