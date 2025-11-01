@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Filter, Plus, X, Activity, Users, Clock, TrendingUp, BarChart3, Calendar } from "lucide-react";

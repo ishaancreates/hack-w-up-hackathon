@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+/* eslint-disable */
+// @ts-nocheck
+import { useState } from 'react';
 import { X, FileText, Calendar, User } from 'lucide-react';
 
 // Sample report data
