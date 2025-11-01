@@ -7,6 +7,7 @@ import LearnMore from './pages/LearnMore.tsx'
 import GetStarted from './pages/GetStarted.tsx'
 import Dashboard from './pages/Dashboard.tsx'
 import SessionPage from './pages/SessionPage.tsx'
+import PatientTimeline from './pages/PatientTimeline.tsx'
 import { TranscriptionPage } from './features/transcription'
 
 createRoot(document.getElementById('root')!).render(
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/get-started" element={<GetStarted />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path='/todays-session' element={<SessionPage />} />
+        <Route path="/patient-timeline" element={<PatientTimeline />} />
         <Route path="/transcription" element={<TranscriptionPage />} />
       </Routes>
     </BrowserRouter>
