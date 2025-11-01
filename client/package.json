@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.16",
     "@vueuse/core": "^14.0.0",
+    "lucide-react": "^0.552.0",
     "lucide-vue-next": "^0.552.0",
     "motion-v": "^1.7.4",
     "react": "^19.1.1",
