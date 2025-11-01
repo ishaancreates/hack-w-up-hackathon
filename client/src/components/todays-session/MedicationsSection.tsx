@@ -19,10 +19,6 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
     selectedMedications,
     onToggleMedication
 }) => {
-    const [searchQuery, setSearchQuery] = React.useState('');
-    const [searchResults, setSearchResults] = React.useState<MedicationData[]>([]);
-    const [isSearching, setIsSearching] = React.useState(false);
-
     const medications: MedicationData[] = [
         {
             id: 'Paracetamol 500mg',
@@ -92,138 +88,12 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
         }
     ];
 
-    // Dummy database search function
-    const searchMedicationsFromDB = React.useCallback((query: string) => {
-        if (!query.trim()) {
-            setSearchResults([]);
-            return;
-        }
-
-        setIsSearching(true);
-
-        // Simulate API call delay
-        setTimeout(() => {
-            // Dummy database with more medications
-            const dummyDB: MedicationData[] = [
-                ...medications,
-                {
-                    id: 'Amoxicillin 500mg',
-                    name: 'Amoxicillin',
-                    dosageOptions: ['250mg', '500mg', '875mg'],
-                    frequencyOptions: [
-                        { value: 'twice-daily', label: 'Twice daily' },
-                        { value: 'thrice-daily', label: 'Thrice daily' }
-                    ],
-                    defaultDosage: '500mg',
-                    defaultFrequency: 'thrice-daily'
-                },
-                {
-                    id: 'Metformin 500mg',
-                    name: 'Metformin',
-                    dosageOptions: ['500mg', '850mg', '1000mg'],
-                    frequencyOptions: [
-                        { value: 'once-daily', label: 'Once daily' },
-                        { value: 'twice-daily', label: 'Twice daily' },
-                        { value: 'with-meals', label: 'With meals' }
-                    ],
-                    defaultDosage: '500mg',
-                    defaultFrequency: 'twice-daily'
-                },
-                {
-                    id: 'Aspirin 75mg',
-                    name: 'Aspirin',
-                    dosageOptions: ['75mg', '100mg', '325mg'],
-                    frequencyOptions: [
-                        { value: 'once-daily', label: 'Once daily' },
-                        { value: 'twice-daily', label: 'Twice daily' }
-                    ],
-                    defaultDosage: '75mg',
-                    defaultFrequency: 'once-daily'
-                },
-                {
-                    id: 'Losartan 50mg',
-                    name: 'Losartan',
-                    dosageOptions: ['25mg', '50mg', '100mg'],
-                    frequencyOptions: [
-                        { value: 'once-daily', label: 'Once daily' },
-                        { value: 'twice-daily', label: 'Twice daily' }
-                    ],
-                    defaultDosage: '50mg',
-                    defaultFrequency: 'once-daily'
-                },
-                {
-                    id: 'Atorvastatin 10mg',
-                    name: 'Atorvastatin',
-                    dosageOptions: ['10mg', '20mg', '40mg', '80mg'],
-                    frequencyOptions: [
-                        { value: 'once-daily', label: 'Once daily' },
-                        { value: 'at-bedtime', label: 'At bedtime' }
-                    ],
-                    defaultDosage: '10mg',
-                    defaultFrequency: 'at-bedtime'
-                },
-                {
-                    id: 'Azithromycin 250mg',
-                    name: 'Azithromycin',
-                    dosageOptions: ['250mg', '500mg'],
-                    frequencyOptions: [
-                        { value: 'once-daily', label: 'Once daily' },
-                        { value: 'course', label: '3-5 day course' }
-                    ],
-                    defaultDosage: '250mg',
-                    defaultFrequency: 'once-daily'
-                }
-            ];
-
-            // Search in dummy DB
-            const results = dummyDB.filter(med =>
-                med.name.toLowerCase().includes(query.toLowerCase())
-            );
-
-            setSearchResults(results);
-            setIsSearching(false);
-        }, 500);
-    }, [medications]);
-
-    React.useEffect(() => {
-        const timer = setTimeout(() => {
-            searchMedicationsFromDB(searchQuery);
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [searchQuery, searchMedicationsFromDB]);
-
-    const displayMedications = searchQuery.trim() ? searchResults : medications;
-
     return (
         <div className="flex-1 flex flex-col min-h-0">
             <h3 className="text-base font-semibold mb-3 text-gray-700 shrink-0">Recommended Medications</h3>
             <div className="flex-1 bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow border border-gray-200 overflow-y-auto">
-                {/* Search Bar */}
-                <div className="mb-3 sticky top-0 bg-white/90 backdrop-blur-sm z-10 pb-2">
-                    <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="Search medications from database..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                        {isSearching && (
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
-                            </div>
-                        )}
-                    </div>
-                    {searchQuery && (
-                        <p className="text-xs text-gray-500 mt-1">
-                            Found {displayMedications.length} result{displayMedications.length !== 1 ? 's' : ''}
-                        </p>
-                    )}
-                </div>
-
                 <div className="space-y-2.5 pb-16">
-                    {displayMedications.map((medication) => (
+                    {medications.map((medication) => (
                         <MedicationCard
                             key={medication.id}
                             name={medication.name}
