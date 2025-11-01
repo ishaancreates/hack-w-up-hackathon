@@ -10,6 +10,8 @@ const initialPatients = [
     { id: 5, name: 'Meera Singh', time: '12:00 PM', status: 'waiting', age: 42, pastDiseases: 'Migraines', weight: '75 kg', bp: '125/80', sugarLevel: '98 mg/dL' },
 ];
 
+// AssemblyAI-based transcription (see hook usage below)
+
 const Sidebar = () => {
     const [patients] = useState(initialPatients);
     const [isHovered, setIsHovered] = useState(false);
@@ -31,7 +33,7 @@ const Sidebar = () => {
         setTranscript([]);
     }, [activePatient]);
 
-    // Intelligently detect speaker based on conversation content
+    // Reflect finals from hook into chat bubbles
     useEffect(() => {
         if (!finals || finals.length === 0) return;
         const last = finals[finals.length - 1];
@@ -155,20 +157,18 @@ const Sidebar = () => {
 
                 {/* Live Transcription Card */}
                 <div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-md">
-                    <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-md flex items-center">
-                            <span className={`w-2 h-2 rounded-full mr-2 ${isListening ? 'bg-red-500 animate-pulse' : 'bg-gray-300'}`}></span>
-                            Live Transcription
-                        </h3>
+                    <h3 className="font-semibold text-md mb-3 flex items-center">
+                        <span className={`w-2 h-2 rounded-full mr-2 ${isListening ? 'bg-red-500 animate-pulse' : 'bg-gray-300'}`}></span>
+                        Live Transcription
                         <button
                             onClick={() => (isListening ? stop() : start())}
-                            className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${isListening ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                            className={`ml-auto flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${isListening ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
                             aria-pressed={isListening}
                             aria-label={isListening ? 'Stop microphone' : 'Start microphone'}
                         >
                             {isListening ? 'Stop Mic' : 'Start Mic'}
                         </button>
-                    </div>
+                    </h3>
                     {error && (
                         <div className="mb-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1" aria-live="polite">
                             {error}
@@ -181,42 +181,24 @@ const Sidebar = () => {
                     >
                         {transcript.map((line, index) => {
                             const isLatestMessage = index === transcript.length - 1;
-                            const isDoctor = line.speaker === 'Doctor';
                             return (
                                 <div
                                     key={`final-${index}`}
-                                    className={`flex transition-all duration-300 ease-in-out ${isDoctor ? 'justify-start' : 'justify-end'} ${isLatestMessage ? 'animate-[slideInUp_0.4s_ease-out]' : ''}`}
+                                    className={`flex transition-all duration-300 ease-in-out ${line.speaker === 'Doctor' ? 'justify-start' : 'justify-end'} ${isLatestMessage ? 'animate-[slideInUp_0.4s_ease-out]' : ''}`}
                                 >
-                                    <div className={`p-2 rounded-lg max-w-[85%] shadow-sm ${isDoctor
-                                        ? 'bg-blue-100 text-blue-900 border border-blue-200'
-                                        : 'bg-green-100 text-green-900 border border-green-200'
-                                        }`}>
-                                        <p className="text-[10px] font-semibold mb-0.5 opacity-70">
-                                            {isDoctor ? '👨‍⚕️ Doctor' : '🧑 Patient'}
-                                        </p>
+                                    <div className={`p-2 rounded-lg max-w-[85%] shadow-sm ${line.speaker === 'Doctor' ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'}`}>
                                         <p className="text-xs">{line.text}</p>
                                     </div>
                                 </div>
                             );
                         })}
-                        {interim && (() => {
-                            const lastSpeaker = transcript.length > 0 ? transcript[transcript.length - 1].speaker : 'Patient';
-                            const nextSpeaker = lastSpeaker === 'Doctor' ? 'Patient' : 'Doctor';
-                            const isDoctor = nextSpeaker === 'Doctor';
-                            return (
-                                <div className={`flex ${isDoctor ? 'justify-start' : 'justify-end'} opacity-80`}>
-                                    <div className={`p-2 rounded-lg max-w-[85%] border ${isDoctor
-                                        ? 'bg-blue-50 text-blue-900 border-blue-200'
-                                        : 'bg-green-50 text-green-900 border-green-200'
-                                        }`}>
-                                        <p className="text-[10px] font-semibold mb-0.5 opacity-70">
-                                            {isDoctor ? '👨‍⚕️ Doctor' : '🧑 Patient'} (typing...)
-                                        </p>
-                                        <p className="text-xs italic">{interim}</p>
-                                    </div>
+                        {interim && (
+                            <div className="flex justify-end opacity-80">
+                                <div className="p-2 rounded-lg max-w-[85%] bg-blue-100 text-gray-800 border border-blue-200">
+                                    <p className="text-xs">{interim}</p>
                                 </div>
-                            );
-                        })()}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

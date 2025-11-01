@@ -4,10 +4,12 @@ import MedicationsSection from './MedicationsSection';
 import TestsSection from './TestsSection';
 import { FileText } from 'lucide-react';
 import ReportViewer from './ReportViewer';
+import { useNavigate } from 'react-router-dom';
 import PrescriptionModal from './PrescriptionModal';
 import { useSession } from '../../contexts/SessionContext';
 
 const MainArea = () => {
+    const navigate = useNavigate();
     const [isReportViewerOpen, setIsReportViewerOpen] = useState(false);
     const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
     const [selectedMedications, setSelectedMedications] = useState<string[]>([]);
@@ -29,6 +31,11 @@ const MainArea = () => {
                 : [...prev, test]
         );
     };
+
+    const handleHistoryClick = () => {
+        navigate('patient-timeline')
+    }
+
 
     return (
         <div className="h-full w-full bg-white p-6 flex flex-col overflow-hidden">
