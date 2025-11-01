@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import DashboardStats from "@/components/dashboard/DashboardStats";
-import PatientCard from "@/components/dashboard/PatientCard";
-import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
-import { cn } from "@/lib/utils";
-import type { AppointmentType, Patient } from "@/types";
+import Sidebar from "../components/dashboard/Sidebar";
+import DashboardStats from "../components/dashboard/DashboardStats";
+import PatientCard from "../components/dashboard/PatientCard";
+import { InteractiveGridPattern } from "../components/ui/interactive-grid-pattern";
+import type { AppointmentType, Patient } from "../types";
 
 const initialPatients: Patient[] = [
   { id: "p1", name: "Rahul Verma", age: 42, reason: "Chest pain", appointmentType: "Consultation", status: "waiting", time: new Date().toISOString() },
@@ -60,7 +59,7 @@ export default function Dashboard() {
   return (
     <main className="relative min-h-screen overflow-hidden">
       <InteractiveGridPattern
-        className={cn("fixed inset-0 h-screen w-screen border-0 select-none", "[mask-image:radial-gradient(60%_60%_at_50%_40%,black,transparent)]")}
+        className={"fixed inset-0 h-screen w-screen border-0 select-none [mask-image:radial-gradient(60%_60%_at_50%_40%,black,transparent)]"}
         squaresClassName="hover:fill-gray-400/40"
         width={42}
         height={42}
