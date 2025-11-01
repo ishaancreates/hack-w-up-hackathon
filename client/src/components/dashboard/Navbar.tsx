@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import logo from "../../assets/curalynx.gif";
 
 export default function Navbar({

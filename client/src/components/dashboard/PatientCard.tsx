@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { Patient } from "@/types";
 
 export default function PatientCard({

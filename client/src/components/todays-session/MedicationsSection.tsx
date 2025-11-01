@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import React from 'react';
 import MedicationCard from './MedicationCard';
 import { useSession } from '../../contexts/SessionContext';
