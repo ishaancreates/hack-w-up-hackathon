@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Filter, Plus, X, Activity, Users, Clock, TrendingUp, BarChart3, Calendar } from "lucide-react";
 
 type AppointmentType = "Consultation" | "Follow-up" | "Emergency" | "Checkup";
@@ -27,6 +28,7 @@ const initialPatients: Patient[] = [
 ];
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
   const [search, setSearch] = useState("");
   const [age, setAge] = useState<string>("");
@@ -72,6 +74,10 @@ export default function Dashboard() {
   
   function onDone(id: string) {
     setPatients((prev) => prev.map((p) => (p.id === id ? { ...p, status: "done" } : p)));
+  }
+
+  function handlePatientClick(patientId: string) {
+    navigate(`/patient/dashboard?id=${patientId}`);
   }
 
   return (
@@ -201,7 +207,7 @@ export default function Dashboard() {
               <div className="overflow-y-auto p-4" style={{ maxHeight: '600px', minHeight: '400px' }}>
                 <div className="space-y-3">
                   {filtered.map((p) => (
-                    <PatientCard key={p.id} patient={p} onStart={onStart} onDone={onDone} />
+                    <PatientCard key={p.id} patient={p} onStart={onStart} onDone={onDone} onClick={() => handlePatientClick(p.id)} />
                   ))}
                   {filtered.length === 0 && (
                     <div className="text-center py-12">
@@ -299,7 +305,7 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
   );
 }
 
-function PatientCard({ patient, onStart, onDone }: { patient: Patient; onStart: (id: string) => void; onDone: (id: string) => void }) {
+function PatientCard({ patient, onStart, onDone, onClick }: { patient: Patient; onStart: (id: string) => void; onDone: (id: string) => void; onClick: () => void }) {
   const statusConfig = {
     waiting: { label: "Waiting", bg: '#fef9e7', text: '#8a7a4a', border: '#e8d4a4' },
     "in-session": { label: "In Session", bg: '#e8f4e8', text: '#4a6a4a', border: '#b8d4b8' },
@@ -317,7 +323,10 @@ function PatientCard({ patient, onStart, onDone }: { patient: Patient; onStart: 
   const typeColor = typeColors[patient.appointmentType];
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all">
+    <div 
+      className="bg-gradient-to-br from-white to-gray-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-all cursor-pointer"
+      onClick={onClick}
+    >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -345,7 +354,10 @@ function PatientCard({ patient, onStart, onDone }: { patient: Patient; onStart: 
         <div className="flex gap-2">
           {patient.status === "waiting" && (
             <button
-              onClick={() => onStart(patient.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onStart(patient.id);
+              }}
               className="px-3 py-1.5 text-white rounded-md text-sm font-medium transition-colors"
               style={{ backgroundColor: '#6a8a6a' }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a7a5a'}
@@ -356,7 +368,10 @@ function PatientCard({ patient, onStart, onDone }: { patient: Patient; onStart: 
           )}
           {patient.status === "in-session" && (
             <button
-              onClick={() => onDone(patient.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDone(patient.id);
+              }}
               className="px-3 py-1.5 text-white rounded-md text-sm font-medium transition-colors"
               style={{ backgroundColor: '#6a8a6a' }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5a7a5a'}
