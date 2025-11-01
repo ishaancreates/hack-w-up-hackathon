@@ -45,10 +45,85 @@ const mockData = {
     { name: 'Chest X-ray', detail: 'Imaging • Aug 04 • Normal' },
     { name: 'A1C', detail: 'Collected Jul 28 • 5.5%' },
   ],
+  allAppointments: [
+    { id: 1, date: 'Nov 2, 9:30 AM', doctor: 'Dr. Maya Chen', type: 'Clinic visit', status: 'Upcoming', time: 'In 1 day' },
+    { id: 2, date: 'Nov 15, 2:00 PM', doctor: 'Dr. Luis Ortega', type: 'Cardio Follow-up', status: 'Upcoming', time: 'In 2 weeks' },
+    { id: 3, date: 'Oct 28, 10:00 AM', doctor: 'Dr. Maya Chen', type: 'Follow-up', status: 'Completed', time: '4 days ago' },
+  ],
+  allMedications: [
+    { id: 1, name: 'Lisinopril 10mg', frequency: '1 tablet daily', refills: '2 refills left', status: 'Active', prescribedBy: 'Dr. Maya Chen' },
+    { id: 2, name: 'Atorvastatin 20mg', frequency: '1 tablet at night', refills: '0 refills', status: 'Request Refill', prescribedBy: 'Dr. Luis Ortega' },
+    { id: 3, name: 'Metformin 500mg', frequency: 'Twice daily', refills: '1 refill left', status: 'Active', prescribedBy: 'Dr. Maya Chen' },
+  ],
+  allReports: [
+    { id: 1, name: 'Lipid Panel', date: 'Feb 12, 2025', type: 'Lab', status: 'Normal', detail: 'HDL 55, LDL 98' },
+    { id: 2, name: 'Chest X-ray', date: 'Aug 04, 2024', type: 'Imaging', status: 'Normal', detail: 'No findings' },
+    { id: 3, name: 'A1C', date: 'Jul 28, 2024', type: 'Lab', status: 'Normal', detail: '5.5%' },
+    { id: 4, name: 'CBC Panel', date: 'Jul 12, 2024', type: 'Lab', status: 'Normal', detail: 'All values normal' },
+    { id: 5, name: 'Metabolic Panel', date: 'Jun 05, 2024', type: 'Lab', status: 'Normal', detail: 'Glucose 95' },
+  ],
+  vitalsSeries: [
+    { date: 'Oct 26', bp: '118/76', hr: '68', weight: '72.4' },
+    { date: 'Oct 19', bp: '120/78', hr: '70', weight: '72.6' },
+    { date: 'Oct 12', bp: '116/74', hr: '66', weight: '72.2' },
+    { date: 'Oct 5', bp: '119/77', hr: '69', weight: '72.8' },
+  ],
+  availableDoctors: [
+    {
+      id: 1,
+      name: 'Dr. Arvinder Singh Soin',
+      title: 'Chairman',
+      department: 'Liver Transplant',
+      specialities: ['Hepatocellular Carcinoma', 'Liver Transplant', 'Liver Surgeries', 'Choledochal Cyst', 'Portal Hypertension'],
+      locations: ['Lucknow', 'Gurugram'],
+      photo: 'https://medanta.s3.ap-south-1.amazonaws.com/all-doctor-with-slug/dr-arvinder-singh-soin.png?w=200&h=200&fit=crop'
+    },
+    {
+      id: 2,
+      name: 'Dr. Aakash Pandita',
+      title: 'Director',
+      department: 'Paediatric Care',
+      specialities: ['Infectious Diseases', 'Jaundice & complex neonatal cases', 'PPHN & Perinatal dialysis', 'Child vaccination'],
+      locations: ['Lucknow'],
+      photo: 'https://medanta.s3.ap-south-1.amazonaws.com/all-doctor-with-slug/dr-aakash-pandita.png?w=200&h=200&fit=crop'
+    },
+    {
+      id: 3,
+      name: 'Dr. Abhai Verma',
+      title: 'Director',
+      department: 'Gastrosciences',
+      specialities: ['Inflammatory Bowel Disease', 'GI Physiology', 'Therapeutic Endoscopy', 'Functional Bowel Diseases'],
+      locations: ['Lucknow'],
+      photo: 'https://medanta.s3.ap-south-1.amazonaws.com/all-doctor-with-slug/dr-abhai-verma.png?w=200&h=200&fit=crop'
+    },
+    {
+      id: 4,
+      name: 'Dr. Amit Agarwal',
+      title: 'Senior Consultant',
+      department: 'Primary Care',
+      specialities: ['General Medicine', 'Preventive Care', 'Chronic Disease Management', 'Patient Education'],
+      locations: ['Lucknow', 'Gurugram'],
+      photo: 'https://medanta.s3.ap-south-1.amazonaws.com/all-doctor-with-slug/dr-amit-agarwal.png?w=200&h=200&fit=crop'
+    },
+    {
+      id: 5,
+      name: 'Dr. Luis Ortega',
+      title: 'Consultant',
+      department: 'Cardiology',
+      specialities: ['Heart Disease', 'Hypertension', 'Arrhythmia Management', 'Cardiac Imaging'],
+      locations: ['Lucknow'],
+      photo: 'https://images.unsplash.com/photo-1612349317150-e88e6ff1fcc4?w=200&h=200&fit=crop'
+    },
+  ],
 }
 
 export function PatientDashboardPage() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [showScheduleModal, setShowScheduleModal] = useState(false)
+  const [showRefillModal, setShowRefillModal] = useState(false)
+  const [showReportDetail, setShowReportDetail] = useState<any>(null)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [readNotifications, setReadNotifications] = useState(new Set())
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard Home', icon: '🏥' },
@@ -56,6 +131,7 @@ export function PatientDashboardPage() {
     { id: 'medications', label: 'Medications', icon: '💊' },
     { id: 'vitals', label: 'Vitals', icon: '❤️' },
     { id: 'reports', label: 'My Reports', icon: '📋' },
+    { id: 'doctors', label: 'Doctors', icon: '👨‍⚕️' },
   ]
 
   return (
@@ -116,17 +192,34 @@ export function PatientDashboardPage() {
 
           {/* Notifications */}
           <div>
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="font-bold text-sm text-gray-900">Notifications</h2>
-              <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">3</span>
-            </div>
-            <div className="space-y-1">
-              {mockData.notifications.map((notif, idx) => (
-                <div key={idx} className="p-2 rounded-lg bg-white border-l-4 border-emerald-500 text-xs">
-                  <p className="text-gray-700 line-clamp-2">{notif.type}</p>
-                  <a href="#" className="text-emerald-600 font-semibold text-xs hover:underline mt-1 block">{notif.action}</a>
+            <h2 className="font-bold text-sm text-gray-900 mb-3">Book an Appointment</h2>
+            <p className="text-xs text-gray-600 mb-3">Meet our specialised doctors</p>
+            <div className="space-y-2">
+              {mockData.availableDoctors.slice(0, 3).map((doctor) => (
+                <div key={doctor.id} className="p-3 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="flex gap-2">
+                    <img
+                      src={doctor.photo}
+                      alt={doctor.name}
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-blue-500"
+                    />
+                    <div className="min-w-0">
+                      <p className="font-semibold text-xs text-gray-900 truncate">{doctor.name}</p>
+                      <p className="text-xs text-blue-600">{doctor.department}</p>
+                      <p className="text-xs text-gray-500 truncate">{doctor.title}</p>
+                    </div>
+                  </div>
+                  <button className="w-full mt-2 px-2 py-1.5 bg-orange-500 text-white rounded-lg font-semibold text-xs hover:bg-orange-600 transition-colors">
+                    Meet the Doctor
+                  </button>
                 </div>
               ))}
+              <button
+                onClick={() => setActiveTab('doctors')}
+                className="w-full mt-3 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold text-xs hover:bg-gray-50"
+              >
+                View All Doctors
+              </button>
             </div>
           </div>
         </div>
@@ -136,9 +229,62 @@ export function PatientDashboardPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* TOP HEADER */}
         <div className="bg-white border-b border-gray-200 px-4 py-4 flex-shrink-0">
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">Welcome back, {mockData.patient.name}</h1>
-            <p className="text-gray-600 text-xs mt-1">{mockData.patient.role}</p>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Welcome back, {mockData.patient.name}</h1>
+              <p className="text-gray-600 text-xs mt-1">{mockData.patient.role}</p>
+            </div>
+            {/* Notification Bell */}
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                </svg>
+                {mockData.notifications.length - readNotifications.size > 0 && (
+                  <span className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {mockData.notifications.length - readNotifications.size}
+                  </span>
+                )}
+              </button>
+              
+              {/* Notifications Dropdown */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                  <div className="p-4 border-b border-gray-200">
+                    <h3 className="font-bold text-gray-900">Notifications</h3>
+                  </div>
+                  <div className="divide-y divide-gray-200">
+                    {mockData.notifications.length > 0 ? (
+                      mockData.notifications.map((notif, idx) => (
+                        <div
+                          key={idx}
+                          className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+                            readNotifications.has(idx) ? 'bg-gray-50' : 'bg-blue-50'
+                          }`}
+                          onClick={() => {
+                            setReadNotifications(new Set([...readNotifications, idx]))
+                          }}
+                        >
+                          <p className={`text-sm ${readNotifications.has(idx) ? 'text-gray-600' : 'text-gray-900 font-semibold'}`}>
+                            {notif.type}
+                          </p>
+                          <button className={`text-xs font-semibold hover:underline mt-2 ${
+                            readNotifications.has(idx) ? 'text-gray-500' : 'text-blue-600'
+                          }`}>
+                            {notif.action} →
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-500 text-sm">No notifications</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* STATS GRID */}
@@ -186,13 +332,20 @@ export function PatientDashboardPage() {
                       <span className="text-lg">📅</span>
                       <h2 className="text-sm font-bold text-gray-900">Upcoming Appointments</h2>
                     </div>
-                    <button className="px-3 py-1 bg-blue-600 text-white rounded-lg font-semibold text-xs hover:bg-blue-700">
+                    <button
+                      onClick={() => setShowScheduleModal(true)}
+                      className="px-3 py-1 bg-blue-600 text-white rounded-lg font-semibold text-xs hover:bg-blue-700 transition-colors"
+                    >
                       Schedule
                     </button>
                   </div>
                   <div className="space-y-1.5">
                     {mockData.appointments.map((apt, idx) => (
-                      <div key={idx} className="p-2.5 rounded-lg bg-blue-50 border border-blue-200">
+                      <div
+                        key={idx}
+                        className="p-2.5 rounded-lg bg-blue-50 border border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors"
+                        onClick={() => alert(`View appointment details: ${apt.doctor}`)}
+                      >
                         <p className="text-xs font-bold text-gray-900">{apt.date}</p>
                         <p className="text-xs text-blue-700 font-semibold mt-0.5">{apt.doctor}</p>
                         <div className="flex justify-between items-center mt-1 text-xs">
@@ -211,13 +364,20 @@ export function PatientDashboardPage() {
                       <span className="text-lg">💊</span>
                       <h2 className="text-sm font-bold text-gray-900">My Medications</h2>
                     </div>
-                    <button className="px-3 py-1 bg-blue-600 text-white rounded-lg font-semibold text-xs hover:bg-blue-700">
+                    <button
+                      onClick={() => setShowRefillModal(true)}
+                      className="px-3 py-1 bg-blue-600 text-white rounded-lg font-semibold text-xs hover:bg-blue-700 transition-colors"
+                    >
                       Refill
                     </button>
                   </div>
                   <div className="space-y-1.5">
                     {mockData.medications.map((med, idx) => (
-                      <div key={idx} className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200">
+                      <div
+                        key={idx}
+                        className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors"
+                        onClick={() => alert(`Medication: ${med.name}\nFrequency: ${med.frequency}\nStatus: ${med.status}`)}
+                      >
                         <p className="text-xs font-bold text-gray-900">{med.name}</p>
                         <div className="grid grid-cols-2 gap-2 mt-1 text-xs">
                           <div>
@@ -252,7 +412,7 @@ export function PatientDashboardPage() {
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Ask Aura..."
+                      placeholder=  "Ask Cura..."
                       className="flex-1 px-2.5 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs"
                     />
                     <button className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg font-semibold text-xs hover:bg-emerald-700">Send</button>
@@ -308,13 +468,22 @@ export function PatientDashboardPage() {
                       <span className="text-base">📋</span>
                       <h2 className="text-sm font-bold text-gray-900">My Reports</h2>
                     </div>
-                    <span className="text-xs text-emerald-600 font-semibold">Explain</span>
+                    <button
+                      onClick={() => setActiveTab('reports')}
+                      className="text-xs text-emerald-600 font-semibold hover:underline"
+                    >
+                      View All
+                    </button>
                   </div>
                   <div className="space-y-2">
-                    {mockData.reports.map((report, idx) => (
-                      <div key={idx} className="p-2 rounded-lg bg-gray-50 border border-gray-200">
+                    {mockData.reports.slice(0, 3).map((report, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2 rounded-lg bg-gray-50 border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+                        onClick={() => setShowReportDetail(report)}
+                      >
                         <p className="text-xs font-bold text-gray-900">{report.name}</p>
-                        <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">{report.detail}</p>
+                        <p className="text-xs text-gray-600 mt-0.5 line-clamp-1">{report.detail}</p>
                       </div>
                     ))}
                   </div>
@@ -324,11 +493,311 @@ export function PatientDashboardPage() {
           )}
 
           {/* Other tabs content */}
-          {activeTab !== 'dashboard' && (
-            <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
+          {activeTab === 'appointments' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">All Appointments</h2>
+              {mockData.allAppointments.map((apt) => (
+                <div key={apt.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">{apt.doctor}</p>
+                      <p className="text-xs text-gray-600 mt-1">{apt.type}</p>
+                      <p className="text-xs text-gray-500 mt-1">{apt.date}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      apt.status === 'Upcoming' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {apt.status}
+                    </span>
+                  </div>
+                  <button className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700">
+                    {apt.status === 'Upcoming' ? 'Reschedule' : 'View Details'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'medications' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">All Medications</h2>
+              {mockData.allMedications.map((med) => (
+                <div key={med.id} className="bg-white rounded-lg border border-gray-200 p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">{med.name}</p>
+                      <p className="text-xs text-gray-600 mt-1">Prescribed by: {med.prescribedBy}</p>
+                      <p className="text-xs text-gray-600">Frequency: {med.frequency}</p>
+                      <p className="text-xs text-gray-500 mt-2">{med.refills}</p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
+                      med.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                    }`}>
+                      {med.status}
+                    </span>
+                  </div>
+                  {med.status === 'Request Refill' && (
+                    <button className="mt-3 px-4 py-2 bg-amber-600 text-white rounded-lg text-xs font-semibold hover:bg-amber-700">
+                      Request Refill
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'vitals' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">My Vitals</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                  <p className="text-sm font-bold text-gray-900 mb-4">Blood Pressure</p>
+                  <div className="space-y-2">
+                    {mockData.vitalsSeries.map((vital, idx) => (
+                      <div key={idx} className="flex justify-between items-center p-2 rounded bg-blue-50">
+                        <span className="text-xs text-gray-600">{vital.date}</span>
+                        <span className="text-sm font-bold text-blue-700">{vital.bp}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                  <p className="text-sm font-bold text-gray-900 mb-4">Heart Rate</p>
+                  <div className="space-y-2">
+                    {mockData.vitalsSeries.map((vital, idx) => (
+                      <div key={idx} className="flex justify-between items-center p-2 rounded bg-emerald-50">
+                        <span className="text-xs text-gray-600">{vital.date}</span>
+                        <span className="text-sm font-bold text-emerald-700">{vital.hr} bpm</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'reports' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900">All Reports</h2>
+              <div className="grid grid-cols-1 gap-3">
+                {mockData.allReports.map((report) => (
+                  <div
+                    key={report.id}
+                    className="bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => setShowReportDetail(report)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{report.name}</p>
+                        <p className="text-xs text-gray-600 mt-1">{report.type} • {report.date}</p>
+                        <p className="text-xs text-gray-500 mt-1">{report.detail}</p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
+                        report.status === 'Normal' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {report.status}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700">
+                        Open
+                      </button>
+                      <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-xs font-semibold hover:bg-gray-50">
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'doctors' && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Our Specialised Doctors</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {mockData.availableDoctors.map((doctor) => (
+                  <div key={doctor.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex gap-4 mb-4">
+                      <img
+                        src={doctor.photo}
+                        alt={doctor.name}
+                        className="w-20 h-20 rounded-full object-cover border-2 border-blue-500 flex-shrink-0"
+                      />
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-900">{doctor.name}</p>
+                        <p className="text-sm text-orange-500 font-semibold">{doctor.title}</p>
+                        <p className="text-xs text-gray-600 mt-1">{doctor.department}</p>
+                      </div>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {doctor.specialities.slice(0, 3).map((spec, idx) => (
+                          <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded flex items-center gap-1">
+                            ✓ {spec}
+                          </span>
+                        ))}
+                      </div>
+                      {doctor.specialities.length > 3 && (
+                        <p className="text-xs text-gray-500">+{doctor.specialities.length - 3} more specialities</p>
+                      )}
+                    </div>
+
+                    <div className="mb-4">
+                      <p className="text-xs font-semibold text-gray-900 mb-2">📍 Locations:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {doctor.locations.map((loc, idx) => (
+                          <span key={idx} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">
+                            {loc}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setShowScheduleModal(true)}
+                      className="w-full px-4 py-2.5 bg-orange-500 text-white rounded-lg font-semibold text-sm hover:bg-orange-600 transition-colors"
+                    >
+                      Meet the Doctor
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {activeTab !== 'dashboard' && activeTab !== 'appointments' && activeTab !== 'medications' && activeTab !== 'vitals' && activeTab !== 'reports' && activeTab !== 'doctors' && (
+            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
               <p className="text-base font-semibold text-gray-900">
                 {tabs.find(t => t.id === activeTab)?.label} content
               </p>
+            </div>
+          )}
+
+          {/* Report Detail Modal */}
+          {showReportDetail && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg max-w-md w-full p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">{showReportDetail.name}</h3>
+                  <button
+                    onClick={() => setShowReportDetail(null)}
+                    className="text-gray-500 hover:text-gray-700 text-xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="space-y-3 mb-6">
+                  <p className="text-sm text-gray-600"><strong>Type:</strong> {showReportDetail.type}</p>
+                  <p className="text-sm text-gray-600"><strong>Date:</strong> {showReportDetail.date}</p>
+                  <p className="text-sm text-gray-600"><strong>Status:</strong> {showReportDetail.status}</p>
+                  <p className="text-sm text-gray-600"><strong>Details:</strong> {showReportDetail.detail}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700">
+                    Open Report
+                  </button>
+                  <button
+                    onClick={() => setShowReportDetail(null)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Schedule Appointment Modal */}
+          {showScheduleModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg max-w-md w-full p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">Schedule Appointment</h3>
+                  <button
+                    onClick={() => setShowScheduleModal(false)}
+                    className="text-gray-500 hover:text-gray-700 text-xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">Select Doctor</label>
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                      <option>Dr. Maya Chen - Primary Care</option>
+                      <option>Dr. Luis Ortega - Cardiology</option>
+                      <option>Nurse Kelly Brooks - Care Nurse</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">Preferred Date</label>
+                    <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">Appointment Type</label>
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                      <option>Clinic Visit</option>
+                      <option>Telehealth</option>
+                      <option>Follow-up</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700">
+                    Schedule
+                  </button>
+                  <button
+                    onClick={() => setShowScheduleModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Refill Modal */}
+          {showRefillModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg max-w-md w-full p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">Request Medication Refill</h3>
+                  <button
+                    onClick={() => setShowRefillModal(false)}
+                    className="text-gray-500 hover:text-gray-700 text-xl"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">Select Medication</label>
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                      <option>Lisinopril 10mg - 2 refills left</option>
+                      <option>Atorvastatin 20mg - 0 refills left</option>
+                      <option>Metformin 500mg - 1 refill left</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">Quantity</label>
+                    <input type="number" placeholder="30 days supply" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700">
+                    Request Refill
+                  </button>
+                  <button
+                    onClick={() => setShowRefillModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
