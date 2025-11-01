@@ -1,25 +1,21 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 import LearnMore from './pages/LearnMore.tsx'
 import GetStarted from './pages/GetStarted.tsx'
-
-function Router() {
-  const path = window.location.pathname.replace(/\/$/, '') || '/';
-  switch (path) {
-    case '/learn-more':
-      return <LearnMore />;
-    case '/get-started':
-      return <GetStarted />;
-    case '/':
-    default:
-      return <App />;
-  }
-}
+import Dashboard from './pages/Dashboard.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Router />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/learn-more" element={<LearnMore />} />
+        <Route path="/get-started" element={<GetStarted />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
   </StrictMode>,
 )

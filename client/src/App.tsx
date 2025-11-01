@@ -1,5 +1,6 @@
 import { InteractiveGridPattern } from "./components/ui/interactive-grid-pattern";
-import { cn } from "./utils";
+import { cn } from "./lib/utils";
+import { Link } from "react-router-dom";
 import "./App.css";
 
 export default function App() {
@@ -33,18 +34,18 @@ export default function App() {
             Curalynx listens, understands, and writes patient notes automatically—so doctors can focus on medicine, not paperwork.
           </p>
           <div className="mt-8 flex items-center justify-center gap-3">
-            <a
-              href="/get-started"
+            <Link
+              to="/get-started"
               className="rounded-md bg-black px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
             >
               Get Started
-            </a>
-            <a
-              href="/learn-more"
+            </Link>
+            <Link
+              to="/learn-more"
               className="rounded-md border border-gray-400/40 bg-white/60 px-5 py-2.5 text-sm font-medium text-gray-900 backdrop-blur-sm transition hover:bg-white/80 dark:bg-black/30 dark:text-white dark:hover:bg-black/50"
             >
               Learn More
-            </a>
+            </Link>
           </div>
         </div>
         <footer className="absolute inset-x-0 bottom-4 z-10 text-center text-xs text-gray-500">
