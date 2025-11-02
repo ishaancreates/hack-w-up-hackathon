@@ -1,20 +1,28 @@
 import { useState, useEffect } from 'react';
 import TopActionButtons from './TopActionButtons';
-import MedicationsSection from './MedicationsSectionReal'; // Make sure this file exists
-import TestsSection from './TestsSectionReal'; // Make sure this file exists
+import MedicationsSection from './MedicationsSection'; // Make sure this file exists
+import TestsSection from './TestsSection'; // Make sure this file exists
 import { FileText, Sparkles } from 'lucide-react';
 import ReportViewer from './ReportViewer';
 import PrescriptionModal from './PrescriptionModal';
 import { useSession } from '../../contexts/SessionContext';
+import HistoryModal from './HistoryModal';
 
 const MainArea = () => {
     const [isReportViewerOpen, setIsReportViewerOpen] = useState(false);
     const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-    const [isTranscriptionStarted, setIsTranscriptionStarted] = useState(false);
     const [selectedMedications, setSelectedMedications] = useState<string[]>([]);
     const [selectedTests, setSelectedTests] = useState<string[]>([]);
+    const [isTranscriptionStarted, setIsTranscriptionStarted] = useState(false);
     const { transcript, activePatient } = useSession();
+
+    // Automatically show recommendations when transcript has content
+    useEffect(() => {
+        if (transcript && transcript.length > 0) {
+            setIsTranscriptionStarted(true);
+        }
+    }, [transcript]);
 
     const toggleMedication = (medication: string) => {
         setSelectedMedications(prev =>
@@ -32,10 +40,12 @@ const MainArea = () => {
         );
     };
 
-    const handleHistoryClick = () => {
-        // TODO: Implement navigation to patient timeline
-        setIsHistoryModalOpen(true);
-    }
+    // const handleHistoryClick = () => {
+    //     navigate('patient-timeline')
+    // }
+    // const handleHistoryClick = () => {
+    //     navigate('patient-timeline')
+    // }
 
 
     return (
@@ -133,6 +143,13 @@ const MainArea = () => {
             <ReportViewer
                 isOpen={isReportViewerOpen}
                 onClose={() => setIsReportViewerOpen(false)}
+            />
+
+            {/* History Modal */}
+            <HistoryModal
+                isOpen={isHistoryModalOpen}
+                onClose={() => setIsHistoryModalOpen(false)}
+                patientInfo={activePatient}
             />
         </div>
     );

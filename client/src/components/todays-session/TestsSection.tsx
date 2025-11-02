@@ -19,6 +19,14 @@ const TestsSection: React.FC<TestsSectionProps> = ({
     const [isSearching, setIsSearching] = React.useState(false);
     const { recommendations, isLoadingRecommendations } = useSession();
 
+    // Debug: Track when recommendations change
+    React.useEffect(() => {
+        console.log('=== TestsSection: Recommendations Changed ===');
+        console.log('Recommendations object:', recommendations);
+        console.log('Tests array:', recommendations?.tests);
+        console.log('============================================');
+    }, [recommendations]);
+
     const tests = [
         'Complete Blood Count (CBC)',
         'Blood Sugar (Fasting)',
@@ -86,12 +94,30 @@ const TestsSection: React.FC<TestsSectionProps> = ({
     }, [searchQuery, searchTestsFromDB]);
 
     // Add AI recommended tests
-    const aiTests = recommendations.tests.map(t => t.name);
+    const aiTests = React.useMemo(() => {
+        console.log('=== TestsSection: Processing AI Recommendations ===');
+        console.log('Test recommendations:', recommendations?.tests);
+        console.log('Tests exists:', !!recommendations?.tests);
+        console.log('Tests count:', recommendations?.tests?.length || 0);
+
+        if (!recommendations || !recommendations.tests || !Array.isArray(recommendations.tests)) {
+            console.log('No valid tests array found');
+            return [];
+        }
+
+        const processed = recommendations.tests.map(t => t.name);
+        console.log('Processed AI tests:', processed);
+        console.log('==================================================');
+        return processed;
+    }, [recommendations]);
+
     const allTests = [...aiTests, ...tests];
     const displayTests = searchQuery.trim() ? searchResults : allTests;
 
-    // Show cards only when AI has recommendations or search is active
-    const shouldShowCards = aiTests.length > 0 || searchQuery.trim();
+    console.log('=== TestsSection Render ===');
+    console.log('aiTests.length:', aiTests.length);
+    console.log('Will show AI section:', aiTests.length > 0 && !searchQuery);
+    console.log('===========================');
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
@@ -153,20 +179,19 @@ const TestsSection: React.FC<TestsSectionProps> = ({
                     </div>
                 )}
 
-                {shouldShowCards && (
-                    <div className="space-y-2.5 pb-16">
-                        {(searchQuery ? displayTests : tests).map((test) => (
-                            <TestCard
-                                key={test}
-                                name={test}
-                                isSelected={selectedTests.includes(test)}
-                                onToggle={() => onToggleTest(test)}
-                            />
-                        ))}
-                    </div>
-                )}
+                {/* Static Tests - Always show */}
+                <div className="space-y-2.5 pb-16">
+                    {(searchQuery ? displayTests : tests).map((test) => (
+                        <TestCard
+                            key={test}
+                            name={test}
+                            isSelected={selectedTests.includes(test)}
+                            onToggle={() => onToggleTest(test)}
+                        />
+                    ))}
+                </div>
             </div>
-        </div>
+        </div >
     );
 };
 
