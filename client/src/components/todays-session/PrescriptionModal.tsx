@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Download, Printer } from 'lucide-react';
+import { X, Download, Printer, Zap } from 'lucide-react';
 
 interface PrescriptionModalProps {
     isOpen: boolean;
@@ -15,6 +15,7 @@ interface PrescriptionModalProps {
         pastDiseases: string;
     };
     transcript: { speaker: string; text: string }[];
+    onApproveWorkflow?: () => Promise<void>;
 }
 
 // Print-specific styles
@@ -72,7 +73,8 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
     selectedMedications,
     selectedTests,
     patientInfo,
-    transcript
+    transcript,
+    onApproveWorkflow
 }) => {
     if (!isOpen) return null;
 
@@ -164,6 +166,12 @@ Generated: ${new Date().toLocaleString()}
         a.download = `SOAP_Note_${patientInfo?.name || 'Patient'}_${Date.now()}.txt`;
         a.click();
         URL.revokeObjectURL(url);
+    };
+
+    const handleApproveWorkflow = async () => {
+        if (onApproveWorkflow) {
+            await onApproveWorkflow();
+        }
     };
 
     return (
@@ -536,6 +544,28 @@ Generated: ${new Date().toLocaleString()}
                     </div>
 
                     {/* Footer Actions */}
+                    <div className="no-print flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+                        <button
+                            onClick={onClose}
+                            className="px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        >
+                            Close
+                        </button>
+                        <button
+                            onClick={handlePrint}
+                            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        >
+                            Print Prescription
+                        </button>
+                        {onApproveWorkflow && (
+                            <button
+                                onClick={handleApproveWorkflow}
+                                className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-300 flex items-center gap-2 font-semibold"
+                            >
+                                <Zap className="w-4 h-4" />
+                                Approve & Run Workflow
+                            </button>
+                        )}
                     <div className="no-print flex items-center justify-between px-6 py-4 border-t-2 border-gray-200 bg-white">
                         <p className="text-xs text-gray-600">
                             <span className="font-semibold">Note:</span> Print button generates traditional prescription format
