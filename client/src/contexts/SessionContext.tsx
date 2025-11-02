@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { getRealtimeRecommendations } from '../services/geminiService';
 import type { GeminiRecommendations } from '../services/geminiService';
+import type { WorkflowPlan, WorkflowExecutionState } from '../services/clinicalWorkflowAgent';
 
 interface TranscriptEntry {
     speaker: string;
@@ -17,6 +18,10 @@ interface SessionContextType {
     isLoadingRecommendations: boolean;
     activePatient: any;
     setActivePatient: (patient: any) => void;
+    workflowPlan: WorkflowPlan | null;
+    setWorkflowPlan: (plan: WorkflowPlan | null) => void;
+    workflowExecutionState: WorkflowExecutionState | null;
+    setWorkflowExecutionState: (state: WorkflowExecutionState | null) => void;
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -38,6 +43,8 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
     const [activePatient, setActivePatient] = useState<any>(null);
     const [lastProcessedIndex, setLastProcessedIndex] = useState(0);
+    const [workflowPlan, setWorkflowPlan] = useState<WorkflowPlan | null>(null);
+    const [workflowExecutionState, setWorkflowExecutionState] = useState<WorkflowExecutionState | null>(null);
 
     const addTranscript = useCallback((speaker: string, text: string) => {
         setTranscript(prev => [...prev, { speaker, text, timestamp: Date.now() }]);
@@ -123,7 +130,11 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 recommendations,
                 isLoadingRecommendations,
                 activePatient,
-                setActivePatient
+                setActivePatient,
+                workflowPlan,
+                setWorkflowPlan,
+                workflowExecutionState,
+                setWorkflowExecutionState
             }}
         >
             {children}

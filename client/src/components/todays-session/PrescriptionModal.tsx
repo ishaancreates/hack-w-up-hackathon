@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Download, Printer } from 'lucide-react';
+import { X, Download, Printer, Zap } from 'lucide-react';
 
 interface PrescriptionModalProps {
     isOpen: boolean;
@@ -15,6 +15,7 @@ interface PrescriptionModalProps {
         pastDiseases: string;
     };
     transcript: { speaker: string; text: string }[];
+    onApproveWorkflow?: () => Promise<void>;
 }
 
 // Print-specific styles
@@ -80,7 +81,8 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
     selectedMedications,
     selectedTests,
     patientInfo,
-    transcript
+    transcript,
+    onApproveWorkflow
 }) => {
     if (!isOpen) return null;
 
@@ -116,6 +118,12 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
         a.download = `Prescription_${patientInfo?.name || 'Patient'}_${Date.now()}.txt`;
         a.click();
         URL.revokeObjectURL(url);
+    };
+
+    const handleApproveWorkflow = async () => {
+        if (onApproveWorkflow) {
+            await onApproveWorkflow();
+        }
     };
 
     return (
@@ -423,6 +431,15 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
                         >
                             Print Prescription
                         </button>
+                        {onApproveWorkflow && (
+                            <button
+                                onClick={handleApproveWorkflow}
+                                className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-lg hover:from-emerald-700 hover:to-teal-700 hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-300 flex items-center gap-2 font-semibold"
+                            >
+                                <Zap className="w-4 h-4" />
+                                Approve & Run Workflow
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
