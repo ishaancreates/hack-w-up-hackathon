@@ -59,7 +59,9 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
                 console.log('=== SessionContext: Sending to Gemini ===');
                 console.log('Transcript Text:', transcriptText);
+                console.log('Transcript Length:', transcriptText.length);
                 console.log('Active Patient:', activePatient);
+                console.log('API Key exists:', !!import.meta.env.VITE_GEMINI_API_KEY);
                 console.log('======================================');
 
                 try {
