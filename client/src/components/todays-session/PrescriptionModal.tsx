@@ -20,18 +20,15 @@ interface PrescriptionModalProps {
 // Print-specific styles
 const printStyles = `
 @media print {
-    /* Hide everything on the page */
     body * {
         visibility: hidden;
     }
     
-    /* Show only the print prescription */
     .print-prescription-only, 
     .print-prescription-only * {
         visibility: visible;
     }
     
-    /* Position at top of page */
     .print-prescription-only {
         position: fixed;
         left: 0;
@@ -43,7 +40,6 @@ const printStyles = `
         margin: 0;
     }
     
-    /* Hide the modal and preview */
     .no-print,
     .print-hide {
         display: none !important;
@@ -54,12 +50,10 @@ const printStyles = `
         size: A4 portrait;
     }
     
-    /* Ensure proper page breaks */
     .print-prescription-only {
         page-break-after: auto;
     }
     
-    /* Print-specific adjustments */
     .print-prescription-only table {
         page-break-inside: avoid;
     }
@@ -72,8 +66,6 @@ const printStyles = `
 }
 `;
 
-
-
 const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
     isOpen,
     onClose,
@@ -84,18 +76,35 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
 }) => {
     if (!isOpen) return null;
 
-    // Extract symptoms from transcript (patient's statements)
-    const symptoms = transcript
+    // SOAP Components
+    // Subjective - Patient's statements
+    const subjective = transcript
         .filter(t => t.speaker.toLowerCase() === 'patient')
         .map(t => t.text)
-        .join('; ');
+        .join(' ');
 
-    // Generate assessment from doctor's observations
+    // Objective - Vitals and observations
+    const objective = {
+        vitals: {
+            bp: patientInfo?.bp || 'Not recorded',
+            weight: patientInfo?.weight || 'Not recorded',
+            sugar: patientInfo?.sugarLevel || 'Not recorded',
+        },
+        pastHistory: patientInfo?.pastDiseases || 'None reported'
+    };
+
+    // Assessment - Doctor's diagnosis
     const assessment = transcript
         .filter(t => t.speaker.toLowerCase() === 'doctor')
-        .slice(-3) // Last 3 doctor statements
+        .slice(-3)
         .map(t => t.text)
         .join('. ');
+
+    // Plan - Medications and tests
+    const plan = {
+        medications: selectedMedications,
+        investigations: selectedTests
+    };
 
     const currentDate = new Date().toLocaleDateString('en-US', {
         year: 'numeric',
@@ -108,12 +117,51 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
     };
 
     const handleDownload = () => {
-        const prescriptionText = document.getElementById('prescription-content')?.innerText;
-        const blob = new Blob([prescriptionText || ''], { type: 'text/plain' });
+        const soapText = `
+MEDICAL CONSULTATION NOTE - SOAP FORMAT
+========================================
+
+Date: ${currentDate}
+Patient: ${patientInfo?.name || 'N/A'}
+Age: ${patientInfo?.age || 'N/A'} years
+
+SUBJECTIVE (Chief Complaint & History):
+${subjective || 'Not documented'}
+
+OBJECTIVE (Clinical Findings):
+Vitals:
+- Blood Pressure: ${objective.vitals.bp}
+- Weight: ${objective.vitals.weight}
+- Blood Sugar: ${objective.vitals.sugar}
+
+Past Medical History: ${objective.pastHistory}
+
+ASSESSMENT (Diagnosis):
+${assessment || 'Clinical assessment pending'}
+
+PLAN (Treatment & Management):
+
+Medications Prescribed:
+${plan.medications.map((med, i) => `${i + 1}. ${med}`).join('\n')}
+
+Investigations Ordered:
+${plan.investigations.map((test, i) => `${i + 1}. ${test}`).join('\n')}
+
+General Advice:
+- Take medicines after meals
+- Drink plenty of water (8-10 glasses per day)
+- Complete the full course of prescribed medicines
+- Follow up if symptoms persist or worsen
+
+========================================
+Generated: ${new Date().toLocaleString()}
+        `.trim();
+
+        const blob = new Blob([soapText], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Prescription_${patientInfo?.name || 'Patient'}_${Date.now()}.txt`;
+        a.download = `SOAP_Note_${patientInfo?.name || 'Patient'}_${Date.now()}.txt`;
         a.click();
         URL.revokeObjectURL(url);
     };
@@ -122,7 +170,7 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
         <>
             <style>{printStyles}</style>
 
-            {/* Print-Only Prescription (Hidden on Screen) */}
+            {/* Print-Only Prescription (Original Format - Hidden on Screen) */}
             <div className="print-prescription-only">
                 <div className="max-w-[8.5in] mx-auto bg-white p-8">
                     {/* Doctor's Letterhead */}
@@ -180,7 +228,7 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
                     <div className="mb-6">
                         <h3 className="font-bold text-gray-900 text-base mb-2 uppercase tracking-wide">Chief Complaints:</h3>
                         <div className="pl-6 text-gray-800 leading-relaxed">
-                            {symptoms || 'As per clinical examination'}
+                            {subjective || 'As per clinical examination'}
                         </div>
                     </div>
 
@@ -282,147 +330,230 @@ const PrescriptionModal: React.FC<PrescriptionModalProps> = ({
                 </div>
             </div>
 
-            {/* Screen Modal */}
+            {/* Screen Modal - SOAP Format */}
             <div className="print-hide fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-gray-200 no-print">
+                    <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#5a7a5a] to-[#7a9a7a] no-print">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-800">Medical Prescription</h2>
-                            <p className="text-sm text-gray-500 mt-1">Preview</p>
+                            <h2 className="text-xl font-bold text-white">Medical Consultation Note</h2>
+                            <p className="text-xs text-white/90 mt-0.5">SOAP Format Documentation</p>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                             <button
                                 onClick={handleDownload}
-                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                title="Download"
+                                className="p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
+                                title="Download SOAP Note"
                             >
                                 <Download className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={handlePrint}
-                                className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                                title="Print"
+                                className="p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
+                                title="Print Prescription"
                             >
                                 <Printer className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={onClose}
-                                className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-white hover:bg-white/20 rounded-lg transition-colors"
                             >
-                                <X className="w-6 h-6" />
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
 
-                    {/* Content - Screen Preview Only */}
-                    <div className="flex-1 overflow-y-auto p-6">
-                        <div className="bg-white">
-                            {/* Preview Header */}
-                            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                                <h3 className="text-lg font-bold text-blue-900 mb-2">Prescription Preview</h3>
-                                <p className="text-sm text-blue-700">Click "Print Prescription" to get the professional prescription format</p>
-                            </div>
-
-                            {/* Patient Info Summary */}
-                            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                                <h3 className="text-base font-semibold text-gray-800 mb-3">Patient Information</h3>
-                                <div className="grid grid-cols-2 gap-3 text-sm">
+                    {/* SOAP Format Content */}
+                    <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-br from-[#fafbfa] to-[#f5f7f5]">
+                        <div className="max-w-4xl mx-auto space-y-4">
+                            {/* Patient Header */}
+                            <div className="bg-white rounded-xl p-5 shadow-sm border-2 border-[#7a9a7a]/20">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="text-lg font-bold text-[#5a7a5a]">Patient Information</h3>
+                                    <span className="text-xs text-gray-600 bg-gray-100 px-3 py-1 rounded-full">{currentDate}</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-4 text-sm">
                                     <div>
-                                        <span className="font-medium text-gray-600">Name:</span>
-                                        <span className="ml-2 text-gray-800">{patientInfo?.name || 'N/A'}</span>
+                                        <span className="text-gray-600">Name:</span>
+                                        <span className="ml-2 font-semibold text-gray-800">{patientInfo?.name || 'N/A'}</span>
                                     </div>
                                     <div>
-                                        <span className="font-medium text-gray-600">Age:</span>
-                                        <span className="ml-2 text-gray-800">{patientInfo?.age || 'N/A'} years</span>
+                                        <span className="text-gray-600">Age:</span>
+                                        <span className="ml-2 font-semibold text-gray-800">{patientInfo?.age || 'N/A'} years</span>
                                     </div>
                                     <div>
-                                        <span className="font-medium text-gray-600">Weight:</span>
-                                        <span className="ml-2 text-gray-800">{patientInfo?.weight || 'N/A'}</span>
-                                    </div>
-                                    <div>
-                                        <span className="font-medium text-gray-600">BP:</span>
-                                        <span className="ml-2 text-gray-800">{patientInfo?.bp || 'N/A'}</span>
-                                    </div>
-                                    <div>
-                                        <span className="font-medium text-gray-600">Sugar:</span>
-                                        <span className="ml-2 text-gray-800">{patientInfo?.sugarLevel || 'N/A'}</span>
-                                    </div>
-                                    <div>
-                                        <span className="font-medium text-gray-600">Date:</span>
-                                        <span className="ml-2 text-gray-800">{currentDate}</span>
+                                        <span className="text-gray-600">Past History:</span>
+                                        <span className="ml-2 font-semibold text-gray-800">{objective.pastHistory}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Symptoms/Complaints */}
-                            {symptoms && (
-                                <div className="mb-4 p-4 bg-orange-50 rounded-lg">
-                                    <h3 className="text-sm font-semibold text-orange-900 mb-2">Chief Complaints</h3>
-                                    <p className="text-sm text-orange-800">{symptoms}</p>
+                            {/* S - Subjective */}
+                            <div className="bg-white rounded-xl p-5 shadow-sm border-2 border-[#7a9a7a]/30">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-[#5a7a5a] to-[#7a9a7a] rounded-lg flex items-center justify-center">
+                                        <span className="text-white font-bold text-lg">S</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base font-bold text-[#4a5a4a]">Subjective</h3>
+                                        <p className="text-xs text-[#5a7a5a]">Chief Complaint & Patient's History</p>
+                                    </div>
                                 </div>
-                            )}
-
-                            {/* Assessment/Diagnosis */}
-                            {assessment && (
-                                <div className="mb-4 p-4 bg-green-50 rounded-lg">
-                                    <h3 className="text-sm font-semibold text-green-900 mb-2">Diagnosis</h3>
-                                    <p className="text-sm text-green-800">{assessment}</p>
+                                <div className="bg-[#f5f7f5] rounded-lg p-4 border border-[#7a9a7a]/20">
+                                    <p className="text-sm text-[#3a4a3a] leading-relaxed">
+                                        {subjective || 'No subjective information documented'}
+                                    </p>
                                 </div>
-                            )}
+                            </div>
 
-                            {/* Medications */}
-                            {selectedMedications.length > 0 && (
-                                <div className="mb-4 p-4 bg-purple-50 rounded-lg">
-                                    <h3 className="text-sm font-semibold text-purple-900 mb-3">Prescribed Medications</h3>
-                                    <ol className="space-y-2">
-                                        {selectedMedications.map((med, index) => (
-                                            <li key={index} className="text-sm text-purple-800">
-                                                <span className="font-semibold">{index + 1}.</span> {med}
+                            {/* O - Objective */}
+                            <div className="bg-white rounded-xl p-5 shadow-sm border-2 border-[#7a9a7a]/30">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-[#5a7a5a] to-[#7a9a7a] rounded-lg flex items-center justify-center">
+                                        <span className="text-white font-bold text-lg">O</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base font-bold text-[#4a5a4a]">Objective</h3>
+                                        <p className="text-xs text-[#5a7a5a]">Clinical Findings & Vital Signs</p>
+                                    </div>
+                                </div>
+                                <div className="bg-[#f5f7f5] rounded-lg p-4 border border-[#7a9a7a]/20">
+                                    <div className="grid grid-cols-3 gap-4 text-sm">
+                                        <div className="bg-white rounded-lg p-3 border border-[#7a9a7a]/20">
+                                            <p className="text-xs text-[#5a7a5a] font-semibold mb-1">Blood Pressure</p>
+                                            <p className="text-base font-bold text-[#4a5a4a]">{objective.vitals.bp}</p>
+                                        </div>
+                                        <div className="bg-white rounded-lg p-3 border border-[#7a9a7a]/20">
+                                            <p className="text-xs text-[#5a7a5a] font-semibold mb-1">Weight</p>
+                                            <p className="text-base font-bold text-[#4a5a4a]">{objective.vitals.weight}</p>
+                                        </div>
+                                        <div className="bg-white rounded-lg p-3 border border-[#7a9a7a]/20">
+                                            <p className="text-xs text-[#5a7a5a] font-semibold mb-1">Blood Sugar</p>
+                                            <p className="text-base font-bold text-[#4a5a4a]">{objective.vitals.sugar}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* A - Assessment */}
+                            <div className="bg-white rounded-xl p-5 shadow-sm border-2 border-[#7a9a7a]/30">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-[#5a7a5a] to-[#7a9a7a] rounded-lg flex items-center justify-center">
+                                        <span className="text-white font-bold text-lg">A</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base font-bold text-[#4a5a4a]">Assessment</h3>
+                                        <p className="text-xs text-[#5a7a5a]">Clinical Diagnosis</p>
+                                    </div>
+                                </div>
+                                <div className="bg-[#f5f7f5] rounded-lg p-4 border border-[#7a9a7a]/20">
+                                    <p className="text-sm text-[#3a4a3a] leading-relaxed">
+                                        {assessment || 'Clinical assessment pending'}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* P - Plan */}
+                            <div className="bg-white rounded-xl p-5 shadow-sm border-2 border-[#7a9a7a]/30">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-[#5a7a5a] to-[#7a9a7a] rounded-lg flex items-center justify-center">
+                                        <span className="text-white font-bold text-lg">P</span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-base font-bold text-[#4a5a4a]">Plan</h3>
+                                        <p className="text-xs text-[#5a7a5a]">Treatment & Management Strategy</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="space-y-4">
+                                    {/* Medications */}
+                                    {plan.medications.length > 0 && (
+                                        <div className="bg-[#f5f7f5] rounded-lg p-4 border border-[#7a9a7a]/20">
+                                            <h4 className="text-xs font-bold text-[#5a7a5a] mb-3 uppercase tracking-wide">Prescribed Medications</h4>
+                                            <div className="space-y-2">
+                                                {plan.medications.map((med, index) => (
+                                                    <div key={index} className="flex items-center gap-3 bg-white rounded-lg p-2 border border-[#7a9a7a]/20">
+                                                        <span className="flex items-center justify-center w-6 h-6 bg-[#7a9a7a]/20 rounded-full text-[#5a7a5a] text-xs font-bold">
+                                                            {index + 1}
+                                                        </span>
+                                                        <span className="text-sm text-[#3a4a3a] font-medium">{med}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Investigations */}
+                                    {plan.investigations.length > 0 && (
+                                        <div className="bg-[#f5f7f5] rounded-lg p-4 border border-[#7a9a7a]/20">
+                                            <h4 className="text-xs font-bold text-[#5a7a5a] mb-3 uppercase tracking-wide">Investigations Ordered</h4>
+                                            <div className="space-y-2">
+                                                {plan.investigations.map((test, index) => (
+                                                    <div key={index} className="flex items-center gap-3 bg-white rounded-lg p-2 border border-[#7a9a7a]/20">
+                                                        <span className="flex items-center justify-center w-6 h-6 bg-[#7a9a7a]/20 rounded-full text-[#5a7a5a] text-xs font-bold">
+                                                            {index + 1}
+                                                        </span>
+                                                        <span className="text-sm text-[#3a4a3a] font-medium">{test}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* General Advice */}
+                                    <div className="bg-[#f5f7f5] rounded-lg p-4 border border-[#7a9a7a]/20">
+                                        <h4 className="text-xs font-bold text-[#5a7a5a] mb-3 uppercase tracking-wide">General Advice</h4>
+                                        <ul className="space-y-2 text-sm text-[#3a4a3a]">
+                                            <li className="flex items-start gap-2">
+                                                <span className="text-[#5a7a5a] mt-0.5">•</span>
+                                                <span>Take medicines after meals</span>
                                             </li>
-                                        ))}
-                                    </ol>
-                                </div>
-                            )}
-
-                            {/* Tests/Investigations */}
-                            {selectedTests.length > 0 && (
-                                <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-                                    <h3 className="text-sm font-semibold text-blue-900 mb-3">Recommended Tests</h3>
-                                    <ul className="space-y-2">
-                                        {selectedTests.map((test, index) => (
-                                            <li key={index} className="text-sm text-blue-800">
-                                                <span className="font-semibold">{index + 1}.</span> {test}
+                                            <li className="flex items-start gap-2">
+                                                <span className="text-[#5a7a5a] mt-0.5">•</span>
+                                                <span>Drink plenty of water (8-10 glasses per day)</span>
                                             </li>
-                                        ))}
-                                    </ul>
+                                            <li className="flex items-start gap-2">
+                                                <span className="text-[#5a7a5a] mt-0.5">•</span>
+                                                <span>Complete the full course of prescribed medicines</span>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <span className="text-[#5a7a5a] mt-0.5">•</span>
+                                                <span>Follow up if symptoms persist or worsen</span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
-                            )}
 
-                            {/* Empty State */}
-                            {selectedMedications.length === 0 && selectedTests.length === 0 && (
-                                <div className="p-8 text-center text-gray-500">
-                                    <p>No medications or tests selected</p>
-                                    <p className="text-xs mt-2">Select medications and tests from the session to generate prescription</p>
-                                </div>
-                            )}
+                                {/* Empty State */}
+                                {plan.medications.length === 0 && plan.investigations.length === 0 && (
+                                    <div className="bg-[#f5f7f5] rounded-lg p-8 text-center border border-[#7a9a7a]/20">
+                                        <p className="text-sm text-[#5a7a5a]">No treatment plan documented</p>
+                                        <p className="text-xs text-[#6a7a6a] mt-1">Select medications and tests to create a treatment plan</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="no-print flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
-                        <button
-                            onClick={onClose}
-                            className="px-6 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                        >
-                            Close
-                        </button>
-                        <button
-                            onClick={handlePrint}
-                            className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
-                        >
-                            Print Prescription
-                        </button>
+                    <div className="no-print flex items-center justify-between px-6 py-4 border-t-2 border-gray-200 bg-white">
+                        <p className="text-xs text-gray-600">
+                            <span className="font-semibold">Note:</span> Print button generates traditional prescription format
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={onClose}
+                                className="px-6 py-2.5 bg-white text-gray-700 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-semibold"
+                            >
+                                Close
+                            </button>
+                            <button
+                                onClick={handlePrint}
+                                className="px-6 py-2.5 bg-gradient-to-r from-[#5a7a5a] to-[#7a9a7a] text-white rounded-xl hover:from-[#4a6a4a] hover:to-[#6a8a6a] transition-all shadow-md font-semibold"
+                            >
+                                Print Prescription
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
