@@ -266,8 +266,9 @@ This is a computer-generated report.
                                                 alt={selectedReport.labName}
                                                 className="w-full h-full object-contain"
                                                 onError={(e) => {
-                                                    e.target.style.display = 'none';
-                                                    e.target.nextElementSibling.style.display = 'flex';
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.style.display = 'none';
+                                                    (target.nextElementSibling as HTMLElement).style.display = 'flex';
                                                 }}
                                             />
                                             <div style={{ display: 'none' }} className="w-full h-full items-center justify-center">
