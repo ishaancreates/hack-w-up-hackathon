@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import TopActionButtons from './TopActionButtons';
-import MedicationsSection from './MedicationsSectionReal'; // Make sure this file exists
-import TestsSection from './TestsSectionReal'; // Make sure this file exists
+import MedicationsSection from './MedicationsSection'; // Make sure this file exists
+import TestsSection from './TestsSection'; // Make sure this file exists
 import { FileText, Sparkles } from 'lucide-react';
 import ReportViewer from './ReportViewer';
 import PrescriptionModal from './PrescriptionModal';
 import { useSession } from '../../contexts/SessionContext';
+import HistoryModal from './HistoryModal';
 
 const MainArea = () => {
     const [isReportViewerOpen, setIsReportViewerOpen] = useState(false);
     const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const [selectedMedications, setSelectedMedications] = useState<string[]>([]);
     const [selectedTests, setSelectedTests] = useState<string[]>([]);
     const [isTranscriptionStarted, setIsTranscriptionStarted] = useState(false);
@@ -41,7 +43,7 @@ const MainArea = () => {
     return (
         <div className="h-full w-full bg-gradient-to-br from-[#fafbfa] to-[#f0f4f0] p-6 flex flex-col overflow-hidden">
             <TopActionButtons />
-            
+
             <div className="recommendations-area flex-1 flex flex-col min-h-0 mt-4">
                 {!isTranscriptionStarted ? (
                     // Show placeholder before transcription starts
@@ -81,19 +83,36 @@ const MainArea = () => {
                 )}
             </div>
 
-            {/* Generate Prescription Button */}
-            <div className="flex justify-center mt-6 shrink-0">
+            {/* Action Buttons */}
+            <div className="flex justify-center items-center gap-4 mt-6 shrink-0">
+                <button
+                    onClick={() => setIsReportViewerOpen(true)}
+                    className="flex items-center gap-3 px-8 py-3.5 bg-white border-2 border-[#7a9a7a] text-[#5a7a5a] font-semibold rounded-xl hover:bg-[#f5f7f5] transition-all duration-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#7a9a7a] focus:ring-offset-2"
+                >
+                    <FileText className="w-5 h-5" />
+                    Reports
+                </button>
+
                 <button
                     onClick={() => setIsPrescriptionModalOpen(true)}
                     disabled={!isTranscriptionStarted}
-                    className={`flex items-center gap-3 px-8 py-3.5 font-semibold rounded-xl transition-all duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-[#7a9a7a] focus:ring-offset-2 ${
-                        isTranscriptionStarted
-                            ? 'bg-gradient-to-r from-[#5a7a5a] to-[#7a9a7a] text-white hover:from-[#4a6a4a] hover:to-[#6a8a6a] hover:shadow-lg'
-                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    }`}
+                    className={`flex items-center gap-3 px-8 py-3.5 font-semibold rounded-xl transition-all duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-[#7a9a7a] focus:ring-offset-2 ${isTranscriptionStarted
+                        ? 'bg-gradient-to-r from-[#5a7a5a] to-[#7a9a7a] text-white hover:from-[#4a6a4a] hover:to-[#6a8a6a] hover:shadow-lg'
+                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
                 >
                     <FileText className="w-5 h-5" />
                     Generate Prescription
+                </button>
+
+                <button
+                    onClick={() => setIsHistoryModalOpen(true)}
+                    className="flex items-center gap-3 px-8 py-3.5 bg-white border-2 border-[#7a9a7a] text-[#5a7a5a] font-semibold rounded-xl hover:bg-[#f5f7f5] transition-all duration-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#7a9a7a] focus:ring-offset-2"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    History
                 </button>
             </div>
 
@@ -116,6 +135,13 @@ const MainArea = () => {
             <ReportViewer
                 isOpen={isReportViewerOpen}
                 onClose={() => setIsReportViewerOpen(false)}
+            />
+
+            {/* History Modal */}
+            <HistoryModal
+                isOpen={isHistoryModalOpen}
+                onClose={() => setIsHistoryModalOpen(false)}
+                patientInfo={activePatient}
             />
         </div>
     );
