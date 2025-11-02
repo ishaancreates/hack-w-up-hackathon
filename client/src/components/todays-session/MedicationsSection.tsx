@@ -30,14 +30,6 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
     const [isSearching, setIsSearching] = React.useState(false);
     const { recommendations, isLoadingRecommendations } = useSession();
 
-    // Debug: Track when recommendations change
-    React.useEffect(() => {
-        console.log('=== MedicationsSection: Recommendations Changed ===');
-        console.log('Recommendations object:', recommendations);
-        console.log('Medications array:', recommendations?.medications);
-        console.log('==================================================');
-    }, [recommendations]);
-
     const medications: MedicationData[] = [
         {
             id: 'Paracetamol 500mg',
@@ -210,17 +202,7 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
 
     // Merge AI recommendations with static medications
     const aiMedications: MedicationData[] = React.useMemo(() => {
-        console.log('=== MedicationsSection: Processing AI Recommendations ===');
-        console.log('Recommendations from context:', recommendations);
-        console.log('Medications exists:', !!recommendations?.medications);
-        console.log('Medications count:', recommendations?.medications?.length || 0);
-
-        if (!recommendations || !recommendations.medications || !Array.isArray(recommendations.medications)) {
-            console.log('No valid medications array found');
-            return [];
-        }
-
-        const processed = recommendations.medications.map(med => ({
+        return recommendations.medications.map(med => ({
             id: `${med.name} ${med.dosage}`,
             name: med.name,
             dosageOptions: [med.dosage],
@@ -230,19 +212,13 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
             isAIRecommended: true,
             aiReason: med.reason
         }));
-
-        console.log('Processed AI medications:', processed);
-        console.log('=======================================================');
-        return processed;
-    }, [recommendations]);
+    }, [recommendations.medications]);
 
     const allMedications = [...aiMedications, ...medications];
     const displayMedications = searchQuery.trim() ? searchResults : allMedications;
 
-    console.log('=== MedicationsSection Render ===');
-    console.log('aiMedications.length:', aiMedications.length);
-    console.log('Will show AI section:', aiMedications.length > 0 && !searchQuery);
-    console.log('================================');
+    // Show cards only when AI has recommendations or search is active
+    const shouldShowCards = aiMedications.length > 0 || searchQuery.trim();
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
@@ -308,23 +284,25 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({
                     </div>
                 )}
 
-                {/* Static Medications - Always show */}
-                <div className="space-y-2.5 pb-16">
-                    {(searchQuery ? displayMedications : medications).map((medication) => (
-                        <MedicationCard
-                            key={medication.id}
-                            name={medication.name}
-                            dosageOptions={medication.dosageOptions}
-                            frequencyOptions={medication.frequencyOptions}
-                            defaultDosage={medication.defaultDosage}
-                            defaultFrequency={medication.defaultFrequency}
-                            isSelected={selectedMedications.includes(medication.id)}
-                            onToggle={() => onToggleMedication(medication.id)}
-                        />
-                    ))}
-                </div>
+                {/* Static Medications - Only show when AI has recommendations or search is active */}
+                {shouldShowCards && (
+                    <div className="space-y-2.5 pb-16">
+                        {(searchQuery ? displayMedications : medications).map((medication) => (
+                            <MedicationCard
+                                key={medication.id}
+                                name={medication.name}
+                                dosageOptions={medication.dosageOptions}
+                                frequencyOptions={medication.frequencyOptions}
+                                defaultDosage={medication.defaultDosage}
+                                defaultFrequency={medication.defaultFrequency}
+                                isSelected={selectedMedications.includes(medication.id)}
+                                onToggle={() => onToggleMedication(medication.id)}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
-        </div >
+        </div>
     );
 };
 
