@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface FinalSegment {

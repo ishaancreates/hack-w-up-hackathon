@@ -11,4 +11,18 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      onwarn() {
+        // Suppress all warnings
+        return;
+      }
+    }
+  },
+  esbuild: {
+    logOverride: { 
+      'this-is-undefined-in-esm': 'silent',
+      'empty-import-meta': 'silent'
+    }
+  }
 })

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import type { Patient } from "@/types";
 
 export default function PatientCard({
@@ -20,8 +20,8 @@ export default function PatientCard({
     patient.status === "in-session"
       ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
       : patient.status === "waiting"
-      ? "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100"
-      : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+        ? "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-100"
+        : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
 
   return (
     <div
