@@ -57,124 +57,7 @@ export default function LearnMore() {
         </div>
       </section>
 
-      {/* What Sets Us Apart Section */}
-      <section className="py-20 bg-white relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">What Sets Us Apart</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              At Curalynx we designed the system with one clear goal: let doctors focus on patients—not keyboards. 
-              Other solutions do parts of that, but here's what sets us apart:
-            </p>
-          </div>
-
-          <div className="space-y-6 mb-12">
-            {/* Robin Healthcare */}
-            <div className="group relative bg-gradient-to-r from-gray-50 to-white border-l-4 border-gray-400 rounded-r-xl p-6 hover:shadow-lg transition-all duration-300 hover:translate-x-2">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
-                    <h3 className="text-xl font-bold text-gray-800">Where Robin Healthcare stands</h3>
-                  </div>
-                  <p className="text-gray-700 leading-relaxed mb-3">
-                    Robin's device listens in the exam room, records audio/video and uses AI plus human-backed scribes to generate clinical notes.
-                  </p>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-700 inline-flex items-center gap-1">
-                    <span>MedCity News</span>
-                    <span className="text-xs">+1</span>
-                  </a>
-                </div>
-                <div className="hidden md:block text-4xl opacity-20 group-hover:opacity-40 transition-opacity">
-                  📹
-                </div>
-              </div>
-            </div>
-
-            {/* MyRx */}
-            <div className="group relative bg-gradient-to-r from-gray-50 to-white border-l-4 border-gray-400 rounded-r-xl p-6 hover:shadow-lg transition-all duration-300 hover:translate-x-2">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }}></div>
-                    <h3 className="text-xl font-bold text-gray-800">Where MyRx stands</h3>
-                  </div>
-                  <p className="text-gray-700 leading-relaxed mb-3">
-                    MyRx offers digital prescription generation, practice-management tools and a strong focus on e-prescriptions and patient portals.
-                  </p>
-                  <a href="#" className="text-sm text-gray-500 hover:text-gray-700 inline-flex items-center gap-1">
-                    <span>myrx.in</span>
-                    <span className="text-xs">+1</span>
-                  </a>
-                </div>
-                <div className="hidden md:block text-4xl opacity-20 group-hover:opacity-40 transition-opacity">
-                  💊
-                </div>
-              </div>
-            </div>
-
-            {/* Curalynx - Featured */}
-            <div className="group relative bg-gradient-to-br from-blue-600 via-blue-500 to-blue-600 border-l-4 border-blue-700 rounded-r-xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-[fadeIn_1s_ease-in]">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
-              
-              <div className="relative">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                  <h3 className="text-2xl font-bold text-white">Where Curalynx stands</h3>
-                </div>
-
-                <div className="space-y-4 mb-4">
-                  <div className="flex items-start gap-3 group/item">
-                    <div className="mt-1.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover/item:scale-150 transition-transform"></div>
-                    <p className="text-blue-50 leading-relaxed flex-1">
-                      <span className="font-semibold text-white">Ambient listening and transcription</span> built directly into workflow—no extra hardware required and no major changes in how the doctor works.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start gap-3 group/item">
-                    <div className="mt-1.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover/item:scale-150 transition-transform"></div>
-                    <p className="text-blue-50 leading-relaxed flex-1">
-                      <span className="font-semibold text-white">Fully structured, SOAP-format notes</span> (Subjective, Objective, Assessment, Plan) delivered instantly so doctors just review and approve rather than type.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start gap-3 group/item">
-                    <div className="mt-1.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover/item:scale-150 transition-transform"></div>
-                    <p className="text-blue-50 leading-relaxed flex-1">
-                      <span className="font-semibold text-white">Supplemented features:</span> speaker detection, medical-term recognition, integration-friendly backend (React-frontend, Python backend), flexible data structure—so small clinics to large practices can adopt easily.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start gap-3 group/item">
-                    <div className="mt-1.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover/item:scale-150 transition-transform"></div>
-                    <p className="text-blue-50 leading-relaxed flex-1">
-                      <span className="font-semibold text-white">Focus on usability and simplicity:</span> less setup, fewer steps, minimal friction for the doctor.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2 text-6xl opacity-20 group-hover:opacity-30 transition-opacity">
-                  ⚡
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Summary Box */}
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-30"></div>
-            <div className="relative">
-              <h4 className="text-xl font-bold text-gray-900 mb-4">In short:</h4>
-              <p className="text-gray-700 leading-relaxed text-lg">
-                While Robin automates documentation with hardware in the room and MyRx focuses on prescription-and-practice tools, 
-                <span className="font-semibold text-blue-700"> Curalynx combines those ideas into an ambient, lightweight, end-to-end scribe workflow </span>
-                purpose-built for speed and ease. We believe this gives doctors back their time—and gives patient care the full attention it deserves.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+     
 
       {/* How It Works Section */}
       <section className="py-16 bg-white">
@@ -340,6 +223,125 @@ export default function LearnMore() {
             Imagine an assistant that can summarize follow-ups, auto-generate prescriptions, and even spot inconsistencies in treatment plans. 
             That's where we're headed.
           </p>
+        </div>
+      </section>
+
+       {/* What Sets Us Apart Section */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">What Sets Us Apart</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              At Curalynx we designed the system with one clear goal: let doctors focus on patients—not keyboards. 
+              Other solutions do parts of that, but here's what sets us apart:
+            </p>
+          </div>
+
+          <div className="space-y-6 mb-12">
+            {/* Robin Healthcare */}
+            <div className="group relative bg-gradient-to-r from-gray-50 to-white border-l-4 border-gray-400 rounded-r-xl p-6 hover:shadow-lg transition-all duration-300 hover:translate-x-2">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></div>
+                    <h3 className="text-xl font-bold text-gray-800">Where Robin Healthcare stands</h3>
+                  </div>
+                  <p className="text-gray-700 leading-relaxed mb-3">
+                    Robin's device listens in the exam room, records audio/video and uses AI plus human-backed scribes to generate clinical notes.
+                  </p>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-700 inline-flex items-center gap-1">
+                    <span>MedCity News</span>
+                    <span className="text-xs">+1</span>
+                  </a>
+                </div>
+                <div className="hidden md:block text-4xl opacity-20 group-hover:opacity-40 transition-opacity">
+                  📹
+                </div>
+              </div>
+            </div>
+
+            {/* MyRx */}
+            <div className="group relative bg-gradient-to-r from-gray-50 to-white border-l-4 border-gray-400 rounded-r-xl p-6 hover:shadow-lg transition-all duration-300 hover:translate-x-2">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }}></div>
+                    <h3 className="text-xl font-bold text-gray-800">Where MyRx stands</h3>
+                  </div>
+                  <p className="text-gray-700 leading-relaxed mb-3">
+                    MyRx offers digital prescription generation, practice-management tools and a strong focus on e-prescriptions and patient portals.
+                  </p>
+                  <a href="#" className="text-sm text-gray-500 hover:text-gray-700 inline-flex items-center gap-1">
+                    <span>myrx.in</span>
+                    <span className="text-xs">+1</span>
+                  </a>
+                </div>
+                <div className="hidden md:block text-4xl opacity-20 group-hover:opacity-40 transition-opacity">
+                  💊
+                </div>
+              </div>
+            </div>
+
+            {/* Curalynx - Featured */}
+            <div className="group relative bg-gradient-to-br from-blue-600 via-blue-500 to-blue-600 border-l-4 border-blue-700 rounded-r-xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-[fadeIn_1s_ease-in]">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
+              
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                  <h3 className="text-2xl font-bold text-white">Where Curalynx stands</h3>
+                </div>
+
+                <div className="space-y-4 mb-4">
+                  <div className="flex items-start gap-3 group/item">
+                    <div className="mt-1.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover/item:scale-150 transition-transform"></div>
+                    <p className="text-blue-50 leading-relaxed flex-1">
+                      <span className="font-semibold text-white">Ambient listening and transcription</span> built directly into workflow—no extra hardware required and no major changes in how the doctor works.
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3 group/item">
+                    <div className="mt-1.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover/item:scale-150 transition-transform"></div>
+                    <p className="text-blue-50 leading-relaxed flex-1">
+                      <span className="font-semibold text-white">Fully structured, SOAP-format notes</span> (Subjective, Objective, Assessment, Plan) delivered instantly so doctors just review and approve rather than type.
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3 group/item">
+                    <div className="mt-1.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover/item:scale-150 transition-transform"></div>
+                    <p className="text-blue-50 leading-relaxed flex-1">
+                      <span className="font-semibold text-white">Supplemented features:</span> speaker detection, medical-term recognition, integration-friendly backend (React-frontend, Python backend), flexible data structure—so small clinics to large practices can adopt easily.
+                    </p>
+                  </div>
+
+                  <div className="flex items-start gap-3 group/item">
+                    <div className="mt-1.5 w-1.5 h-1.5 bg-blue-200 rounded-full group-hover/item:scale-150 transition-transform"></div>
+                    <p className="text-blue-50 leading-relaxed flex-1">
+                      <span className="font-semibold text-white">Focus on usability and simplicity:</span> less setup, fewer steps, minimal friction for the doctor.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2 text-6xl opacity-20 group-hover:opacity-30 transition-opacity">
+                  ⚡
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Summary Box */}
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-30"></div>
+            <div className="relative">
+              <h4 className="text-xl font-bold text-gray-900 mb-4">In short:</h4>
+              <p className="text-gray-700 leading-relaxed text-lg">
+                While Robin automates documentation with hardware in the room and MyRx focuses on prescription-and-practice tools, 
+                <span className="font-semibold text-blue-700"> Curalynx combines those ideas into an ambient, lightweight, end-to-end scribe workflow </span>
+                purpose-built for speed and ease. We believe this gives doctors back their time—and gives patient care the full attention it deserves.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
