@@ -2,7 +2,9 @@
 // @ts-nocheck
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, Plus, X, Activity, Users, Clock, TrendingUp, BarChart3, Calendar } from "lucide-react";
+import { Search, Filter, Plus, X, Activity, Users, Clock, TrendingUp, BarChart3, Calendar, DoorOpen, LogOut } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 
 type AppointmentType = "Consultation" | "Follow-up" | "Emergency" | "Checkup";
 type PatientStatus = "waiting" | "in-session" | "done";
@@ -32,9 +34,8 @@ const initialPatients: Patient[] = [
 export default function Dashboard() {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>(initialPatients);
-  const [search, setSearch] = useState("");
-  const [age, setAge] = useState<string>("");
-  const [type, setType] = useState<AppointmentType | "">("");
+  const [patientId, setPatientId] = useState("");
+  const [status, setStatus] = useState<PatientStatus | "">("");
 
   const activeSessions = useMemo(() => patients.filter((p) => p.status === "in-session").length, [patients]);
   const waitingCount = useMemo(() => patients.filter((p) => p.status === "waiting").length, [patients]);
@@ -42,12 +43,11 @@ export default function Dashboard() {
 
   const filtered = useMemo(() => {
     return patients.filter((p) => {
-      const byName = !search || p.name.toLowerCase().includes(search.toLowerCase());
-      const byAge = !age || String(p.age) === age.trim();
-      const byType = !type || p.appointmentType === type;
-      return byName && byAge && byType;
+      const byId = !patientId || p.id.toLowerCase().includes(patientId.toLowerCase()) || p.name.toLowerCase().includes(patientId.toLowerCase());
+      const byStatus = !status || p.status === status;
+      return byId && byStatus;
     });
-  }, [patients, search, age, type]);
+  }, [patients, patientId, status]);
 
   const appointmentTypeData = useMemo(() => {
     const counts = patients.reduce((acc, p) => {
@@ -101,28 +101,61 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border" style={{ backgroundColor: '#e8f4e8', borderColor: '#b8d4b8' }}>
                 <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#5a7a5a' }}></div>
                 <span className="text-sm font-medium" style={{ color: '#4a6a4a' }}>Live</span>
               </div>
+              <button
+                onClick={() => navigate('/get-started')}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg transition-all hover:opacity-90"
+                style={{ background: 'linear-gradient(to right, #6a8a6a, #7a9a7a)' }}
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Title and Add Button */}
+        {/* Title and Buttons */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h2 className="text-3xl font-bold text-gray-900">Dashboard</h2>
             <p className="text-gray-600 mt-1">Manage your appointments and patients</p>
           </div>
-          <AddPatient onAdd={addPatient} />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/todays-session')}
+              className="relative flex items-center gap-2 px-4 py-2.5 text-white rounded-lg font-medium transition-all shadow-sm hover:shadow-md overflow-hidden group"
+            >
+              <div
+                className="absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-300"
+                style={{
+                  background: 'linear-gradient(135deg, #5a7a5a 0%, #6a8a6a 25%, #7a9a7a 50%, #6a8a6a 75%, #5a7a5a 100%)',
+                  backgroundSize: '400% 400%',
+                  animation: 'gradientShift 3s ease infinite'
+                }}
+              ></div>
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{
+                  background: 'linear-gradient(135deg, #4a6a4a 0%, #5a7a5a 25%, #6a8a6a 50%, #5a7a5a 75%, #4a6a4a 100%)',
+                  backgroundSize: '400% 400%',
+                  animation: 'gradientShift 2s ease infinite'
+                }}
+              ></div>
+              <Activity className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">Start Session</span>
+            </button>
+            <AddPatient onAdd={addPatient} />
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard
             icon={<Users className="w-6 h-6" />}
             label="Total Patients"
@@ -149,53 +182,72 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-2 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name"
-                className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:border-transparent outline-none transition-all"
-                onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #7a9a7a'}
-                onBlur={(e) => e.target.style.boxShadow = 'none'}
-              />
+        {/* Analytics Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+          {/* Patient Trends Graph */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp className="w-4 h-4" style={{ color: '#5a7a5a' }} />
+              <h3 className="text-base font-semibold text-gray-900">Patient Trends</h3>
             </div>
+            <PatientTrendGraph />
+          </div>
+
+          {/* Patient Distribution Heatmap */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="w-4 h-4" style={{ color: '#5a7a5a' }} />
+              <h3 className="text-base font-semibold text-gray-900">Patient Distribution</h3>
+            </div>
+            <IndiaHeatmap />
+          </div>
+
+          {/* Appointment Types Distribution */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Calendar className="w-4 h-4" style={{ color: '#5a7a5a' }} />
+              <h3 className="text-base font-semibold text-gray-900">Appointment Types</h3>
+            </div>
+            <AppointmentTypesGraph appointmentTypeData={appointmentTypeData} totalPatients={patients.length} />
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 mb-6 inline-flex items-center gap-3">
+          <div className="relative" style={{ width: '200px' }}>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              placeholder="Filter by age"
-              className="px-3 py-2.5 rounded-lg border border-gray-300 focus:border-transparent outline-none transition-all"
+              value={patientId}
+              onChange={(e) => setPatientId(e.target.value)}
+              placeholder="Search by ID/Name"
+              className="w-full pl-10 pr-3 py-2 text-sm rounded-lg border border-gray-300 focus:border-transparent outline-none transition-all"
               onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #7a9a7a'}
               onBlur={(e) => e.target.style.boxShadow = 'none'}
             />
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value as AppointmentType | "")}
-              className="px-3 py-2.5 rounded-lg border border-gray-300 focus:border-transparent outline-none transition-all"
-              onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #7a9a7a'}
-              onBlur={(e) => e.target.style.boxShadow = 'none'}
-            >
-              <option value="">All types</option>
-              <option value="Consultation">Consultation</option>
-              <option value="Follow-up">Follow-up</option>
-              <option value="Emergency">Emergency</option>
-              <option value="Checkup">Checkup</option>
-            </select>
-            <button
-              onClick={() => {
-                setSearch("");
-                setAge("");
-                setType("");
-              }}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors font-medium"
-            >
-              <Filter className="w-4 h-4" />
-              Reset
-            </button>
           </div>
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as PatientStatus | "")}
+            className="px-3 py-2 text-sm rounded-lg border border-gray-300 focus:border-transparent outline-none transition-all"
+            style={{ width: '140px' }}
+            onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #7a9a7a'}
+            onBlur={(e) => e.target.style.boxShadow = 'none'}
+          >
+            <option value="">All Status</option>
+            <option value="waiting">Waiting</option>
+            <option value="in-session">In Session</option>
+            <option value="done">Done</option>
+          </select>
+          <button
+            onClick={() => {
+              setPatientId("");
+              setStatus("");
+            }}
+            className="flex items-center justify-center gap-2 px-3 py-2 text-sm rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors font-medium"
+          >
+            <Filter className="w-4 h-4" />
+            Reset
+          </button>
         </div>
 
         {/* Main Content Grid */}
@@ -224,57 +276,87 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Analytics Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Analytics Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5" style={{ color: '#5a7a5a' }} />
-                <h3 className="text-lg font-semibold text-gray-900">Analytics</h3>
+          {/* Right Sidebar - Additional Info Cards */}
+          <div className="lg:col-span-1 space-y-4">
+            {/* Today's Schedule */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Clock className="w-4 h-4" style={{ color: '#5a7a5a' }} />
+                <h3 className="text-base font-semibold text-gray-900">Today's Schedule</h3>
               </div>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Avg. Consultation</span>
-                    <span className="font-semibold text-gray-900">18 min</span>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#5a7a5a' }}></div>
+                    <span className="text-sm text-gray-600">9:00 AM</span>
                   </div>
-                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full" style={{ width: '75%', background: 'linear-gradient(to right, #6a8a6a, #7a9a7a)' }}></div>
-                  </div>
+                  <span className="text-xs font-medium px-2 py-1 rounded" style={{ backgroundColor: '#e8f4e8', color: '#5a7a5a' }}>Consultation</span>
                 </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Completion Rate</span>
-                    <span className="font-semibold text-gray-900">89%</span>
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6a8a6a' }}></div>
+                    <span className="text-sm text-gray-600">11:30 AM</span>
                   </div>
-                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full" style={{ width: '89%', background: 'linear-gradient(to right, #5a7a5a, #6a8a6a)' }}></div>
+                  <span className="text-xs font-medium px-2 py-1 rounded" style={{ backgroundColor: '#e8f4e8', color: '#5a7a5a' }}>Follow-up</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#7a9a7a' }}></div>
+                    <span className="text-sm text-gray-600">2:00 PM</span>
                   </div>
+                  <span className="text-xs font-medium px-2 py-1 rounded" style={{ backgroundColor: '#e8f4e8', color: '#5a7a5a' }}>Checkup</span>
+                </div>
+                <div className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#8aaa8a' }}></div>
+                    <span className="text-sm text-gray-600">4:30 PM</span>
+                  </div>
+                  <span className="text-xs font-medium px-2 py-1 rounded" style={{ backgroundColor: '#e8f4e8', color: '#5a7a5a' }}>Emergency</span>
                 </div>
               </div>
             </div>
 
-            {/* Trends Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-5 h-5" style={{ color: '#5a7a5a' }} />
-                <h3 className="text-lg font-semibold text-gray-900">Appointment Types</h3>
+            {/* Quick Actions */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Activity className="w-4 h-4" style={{ color: '#5a7a5a' }} />
+                <h3 className="text-base font-semibold text-gray-900">Quick Actions</h3>
+              </div>
+              <div className="space-y-2">
+                <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  New Appointment
+                </button>
+                <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  View Calendar
+                </button>
+                <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" />
+                  Generate Report
+                </button>
+              </div>
+            </div>
+
+            {/* Recent Activity */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="w-4 h-4" style={{ color: '#5a7a5a' }} />
+                <h3 className="text-base font-semibold text-gray-900">Recent Activity</h3>
               </div>
               <div className="space-y-3">
-                {Object.entries(appointmentTypeData).map(([type, count]) => (
-                  <div key={type} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{type}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full"
-                          style={{ width: `${(count / patients.length) * 100}%`, background: 'linear-gradient(to right, #6a8a6a, #7a9a7a)' }}
-                        ></div>
-                      </div>
-                      <span className="text-sm font-semibold text-gray-900 w-6 text-right">{count}</span>
-                    </div>
-                  </div>
-                ))}
+                <div className="text-sm">
+                  <p className="text-gray-600">Patient discharge</p>
+                  <p className="text-xs text-gray-400">5 minutes ago</p>
+                </div>
+                <div className="text-sm border-t border-gray-100 pt-3">
+                  <p className="text-gray-600">New lab results</p>
+                  <p className="text-xs text-gray-400">15 minutes ago</p>
+                </div>
+                <div className="text-sm border-t border-gray-100 pt-3">
+                  <p className="text-gray-600">Prescription updated</p>
+                  <p className="text-xs text-gray-400">1 hour ago</p>
+                </div>
               </div>
             </div>
           </div>
@@ -384,6 +466,316 @@ function PatientCard({ patient, onStart, onDone, onClick }: { patient: Patient; 
               Complete
             </button>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PatientTrendGraph() {
+  // Dummy data for the last 7 days
+  const data = [
+    { day: 'Mon', patients: 12 },
+    { day: 'Tue', patients: 15 },
+    { day: 'Wed', patients: 9 },
+    { day: 'Thu', patients: 18 },
+    { day: 'Fri', patients: 14 },
+    { day: 'Sat', patients: 8 },
+    { day: 'Sun', patients: 6 },
+  ];
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white px-2 py-1.5 rounded-lg shadow-lg border border-gray-200">
+          <p className="text-xs font-semibold text-gray-900">{payload[0].payload.day}</p>
+          <p className="text-xs" style={{ color: '#5a7a5a' }}>
+            {payload[0].value} patients
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div>
+      <ResponsiveContainer width="100%" height={140}>
+        <AreaChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+          <defs>
+            <linearGradient id="colorPatients" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#6a8a6a" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#6a8a6a" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+          <XAxis
+            dataKey="day"
+            stroke="#9ca3af"
+            style={{ fontSize: '10px' }}
+            tickLine={false}
+          />
+          <YAxis
+            stroke="#9ca3af"
+            style={{ fontSize: '10px' }}
+            tickLine={false}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Area
+            type="monotone"
+            dataKey="patients"
+            stroke="#5a7a5a"
+            strokeWidth={2.5}
+            fill="url(#colorPatients)"
+            activeDot={{ r: 5, fill: '#5a7a5a', stroke: '#fff', strokeWidth: 2 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-2 pt-2 mt-2 border-t border-gray-100">
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Peak</div>
+          <div className="text-sm font-semibold text-gray-900">Thu</div>
+        </div>
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Avg</div>
+          <div className="text-sm font-semibold text-gray-900">
+            {Math.round(data.reduce((sum, d) => sum + d.patients, 0) / data.length)}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ConsultationTimeGraph() {
+  const data = [
+    { time: '0-10', count: 8 },
+    { time: '10-20', count: 22 },
+    { time: '20-30', count: 15 },
+    { time: '30-40', count: 10 },
+    { time: '40+', count: 5 },
+  ];
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white px-2 py-1.5 rounded-lg shadow-lg border border-gray-200">
+          <p className="text-xs font-semibold text-gray-900">{payload[0].payload.time} min</p>
+          <p className="text-xs" style={{ color: '#5a7a5a' }}>
+            {payload[0].value} sessions
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div>
+      <ResponsiveContainer width="100%" height={140}>
+        <AreaChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+          <defs>
+            <linearGradient id="colorTime" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#7a9a7a" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="#7a9a7a" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+          <XAxis
+            dataKey="time"
+            stroke="#9ca3af"
+            style={{ fontSize: '10px' }}
+            tickLine={false}
+          />
+          <YAxis
+            stroke="#9ca3af"
+            style={{ fontSize: '10px' }}
+            tickLine={false}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Area
+            type="monotone"
+            dataKey="count"
+            stroke="#6a8a6a"
+            strokeWidth={2.5}
+            fill="url(#colorTime)"
+            activeDot={{ r: 5, fill: '#6a8a6a', stroke: '#fff', strokeWidth: 2 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-2 pt-2 mt-2 border-t border-gray-100">
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Most Common</div>
+          <div className="text-sm font-semibold text-gray-900">10-20m</div>
+        </div>
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Avg Time</div>
+          <div className="text-sm font-semibold text-gray-900">18m</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function IndiaHeatmap() {
+  // Real India GeoJSON URL
+  const geoUrl = "https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson";
+
+  // Major cities with patient data
+  const cities = [
+    { name: "Delhi", coordinates: [77.2090, 28.6139], patients: 145 },
+    { name: "Mumbai", coordinates: [72.8777, 19.0760], patients: 198 },
+    { name: "Bangalore", coordinates: [77.5946, 12.9716], patients: 176 },
+    { name: "Kolkata", coordinates: [88.3639, 22.5726], patients: 112 },
+    { name: "Chennai", coordinates: [80.2707, 13.0827], patients: 134 },
+    { name: "Hyderabad", coordinates: [78.4867, 17.3850], patients: 89 },
+    { name: "Pune", coordinates: [73.8567, 18.5204], patients: 78 },
+    { name: "Ahmedabad", coordinates: [72.5714, 23.0225], patients: 67 },
+  ];
+
+  const maxPatients = Math.max(...cities.map(c => c.patients));
+
+  // Function to calculate circle radius and color based on patient count
+  const getCircleProps = (patients: number) => {
+    const normalizedSize = (patients / maxPatients);
+    return {
+      radius: 2 + normalizedSize * 6,
+      opacity: 0.4 + normalizedSize * 0.6,
+      color: normalizedSize > 0.7 ? '#4a6a4a' : normalizedSize > 0.4 ? '#5a7a5a' : '#6a8a6a'
+    };
+  };
+
+  return (
+    <div>
+      {/* Map */}
+      <div className="relative" style={{ width: '100%', height: '100%' }}>
+        <ComposableMap
+          projection="geoMercator"
+          projectionConfig={{
+            scale: 400,
+            center: [82, 23]
+          }}
+          width={300}
+          height={120}
+        >
+          <Geographies geography={geoUrl}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="#e8f0e8"
+                  stroke="#b8d4b8"
+                  strokeWidth={0.5}
+                  style={{
+                    default: { outline: 'none' },
+                    hover: { outline: 'none', fill: '#d4e4d4' },
+                    pressed: { outline: 'none' },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
+
+          {/* Circular heatmap markers */}
+          {cities.map(({ name, coordinates, patients }) => {
+            const { radius, opacity, color } = getCircleProps(patients);
+            return (
+              <Marker key={name} coordinates={coordinates}>
+                <circle
+                  r={radius}
+                  fill={color}
+                  opacity={opacity}
+                  stroke="#fff"
+                  strokeWidth={0.5}
+                >
+                  <title>{name}: {patients} patients</title>
+                </circle>
+              </Marker>
+            );
+          })}
+        </ComposableMap>
+      </div>
+
+
+
+    </div>
+  );
+}
+
+function AppointmentTypesGraph({ appointmentTypeData, totalPatients }: { appointmentTypeData: Record<string, number>; totalPatients: number }) {
+  const data = Object.entries(appointmentTypeData).map(([type, count]) => ({
+    name: type,
+    value: count,
+    percentage: Math.round((count / totalPatients) * 100)
+  }));
+
+  const COLORS = ['#5a7a5a', '#6a8a6a', '#7a9a7a', '#8aaa8a'];
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white px-2 py-1.5 rounded-lg shadow-lg border border-gray-200">
+          <p className="text-xs font-semibold text-gray-900">{payload[0].payload.name}</p>
+          <p className="text-xs" style={{ color: '#5a7a5a' }}>
+            {payload[0].value} ({payload[0].payload.percentage}%)
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div>
+      <ResponsiveContainer width="100%" height={140}>
+        <AreaChart data={data} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+          <defs>
+            <linearGradient id="colorTypes" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#5a7a5a" stopOpacity={0.4} />
+              <stop offset="95%" stopColor="#5a7a5a" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+          <XAxis
+            dataKey="name"
+            stroke="#9ca3af"
+            style={{ fontSize: '9px' }}
+            tickLine={false}
+            angle={-15}
+            textAnchor="end"
+            height={35}
+          />
+          <YAxis
+            stroke="#9ca3af"
+            style={{ fontSize: '10px' }}
+            tickLine={false}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Area
+            type="monotone"
+            dataKey="value"
+            stroke="#5a7a5a"
+            strokeWidth={2.5}
+            fill="url(#colorTypes)"
+            activeDot={{ r: 5, fill: '#5a7a5a', stroke: '#fff', strokeWidth: 2 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-2 pt-2 mt-2 border-t border-gray-100">
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Total Types</div>
+          <div className="text-sm font-semibold text-gray-900">{Object.keys(appointmentTypeData).length}</div>
+        </div>
+        <div className="text-center">
+          <div className="text-xs text-gray-500">Total</div>
+          <div className="text-sm font-semibold text-gray-900">{totalPatients}</div>
         </div>
       </div>
     </div>
