@@ -11,6 +11,7 @@ const MainArea = () => {
     const [isReportViewerOpen, setIsReportViewerOpen] = useState(false);
     const [isPrescriptionModalOpen, setIsPrescriptionModalOpen] = useState(false);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+    const [isTranscriptionStarted, setIsTranscriptionStarted] = useState(false);
     const [selectedMedications, setSelectedMedications] = useState<string[]>([]);
     const [selectedTests, setSelectedTests] = useState<string[]>([]);
     const { transcript, activePatient } = useSession();
@@ -32,7 +33,8 @@ const MainArea = () => {
     };
 
     const handleHistoryClick = () => {
-        navigate('patient-timeline')
+        // TODO: Implement navigation to patient timeline
+        setIsHistoryModalOpen(true);
     }
 
 
