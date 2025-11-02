@@ -140,8 +140,8 @@ export default function App() {
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
             Doctor is now LIVE
           </span>
-          <h1 className="mt-6 text-balance text-4xl font-semibold tracking-tight sm:text-6xl">
-            Get quick patient checkups using CuralynX
+          <h1 className="mt-6 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
+            Redefining clinical documentation with AI precision and empathy with CuralynX.
           </h1>
           <p className="mt-4 text-pretty text-base text-gray-600 sm:mt-6 sm:text-lg dark:text-gray-300">
             Curalynx listens, understands, and writes patient notes automatically—so doctors can focus on medicine, not paperwork.
@@ -222,7 +222,7 @@ export default function App() {
 
       {/* Site Footer */}
       <footer className="relative z-10 border-t border-white/10 bg-white/60 backdrop-blur-sm dark:bg-black/30">
-        <div className="mx-auto max-w-6xl px-6 py-6 text-center sm:flex sm:items-center sm:justify-between">
+        <div className="mx-auto max-w-6xl px-6 py-2 text-center sm:flex sm:items-center sm:justify-between">
           <p className="text-sm text-gray-700 dark:text-gray-300">© {new Date().getFullYear()} Team BODMAS</p>
           <div className="mt-3 flex items-center justify-center gap-5 sm:mt-0">
             <a href="#" className="text-sm text-gray-600 underline-offset-4 hover:underline dark:text-gray-300">Privacy</a>
