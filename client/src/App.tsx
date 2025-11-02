@@ -6,14 +6,29 @@ import { useState, useEffect } from "react";
 
 export default function App() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showCard, setShowCard] = useState(true);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
+    const handleScroll = () => {
+      // Hide card after scrolling more than 80vh (80% of viewport height)
+      if (window.scrollY > window.innerHeight * 0.8) {
+        setShowCard(false);
+      } else {
+        setShowCard(true);
+      }
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", handleScroll);
+    
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
@@ -34,7 +49,9 @@ export default function App() {
 
       {/* Floating Prescription Card - Follows Cursor */}
       <div 
-        className="fixed z-50 hidden w-72 opacity-70 pointer-events-none lg:block transition-all duration-200 ease-out"
+        className={`fixed z-50 w-72 pointer-events-none lg:block transition-all duration-300 ease-out ${
+          showCard ? 'opacity-70' : 'opacity-0 invisible'
+        }`}
         style={{
           left: `${mousePosition.x + 20}px`,
           top: `${mousePosition.y + 20}px`,
