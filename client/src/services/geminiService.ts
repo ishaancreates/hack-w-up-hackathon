@@ -32,7 +32,7 @@ export async function getRealtimeRecommendations(
 ): Promise<GeminiRecommendations> {
     try {
         // Initialize the Gemini API with the key
-        const apiKey = import.meta.env.GEMINI_API_KEY;
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
         if (!apiKey) {
             console.warn('Gemini API key not found. Please set VITE_GEMINI_API_KEY in .env file');
